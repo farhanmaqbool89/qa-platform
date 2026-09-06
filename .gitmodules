@@ -1,7 +1,7 @@
 [submodule "qa-backend"]
     path = qa-backend
-    url = https://gitlab.expertflow.com/qa-execution/qa-backend
+    url = https://github.com/farhanmaqbool89/qa-backend
 
 [submodule "qa-test-execution-dashboard"]
     path = qa-test-execution-dashboard
-    url = https://gitlab.expertflow.com/qa-execution/qa-dashboard
+    url = https://github.com/farhanmaqbool89/qa-dashboard
