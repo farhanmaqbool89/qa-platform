@@ -1,0 +1,52 @@
+<div class="auth-container">
+  <div class="auth-box glass-card">
+    <div class="brand-header">
+      <div class="brand-logo">
+        <mat-icon>domain_add</mat-icon>
+      </div>
+      <h2>Register Organization</h2>
+      <p class="subtitle">Create your multi-tenant AI QA workspace</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="auth-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Organization Name</mat-label>
+        <input matInput type="text" [(ngModel)]="organizationName" name="organizationName" required placeholder="Acme QA Corp" />
+        <mat-icon matSuffix>business</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Full Name</mat-label>
+        <input matInput type="text" [(ngModel)]="name" name="name" placeholder="John Doe" />
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Work Email Address</mat-label>
+        <input matInput type="email" [(ngModel)]="email" name="email" required placeholder="john@acme.com" />
+        <mat-icon matSuffix>email</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" [(ngModel)]="password" name="password" required />
+        <mat-icon matSuffix>lock</mat-icon>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit" [disabled]="loading" class="auth-btn" style="margin-top: 1rem;">
+        <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+        <span *ngIf="!loading">Create Account</span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <span>Already have an organization account?</span>
+      <a routerLink="/login" class="link-highlight">Sign In</a>
+    </div>
+  </div>
+</div>

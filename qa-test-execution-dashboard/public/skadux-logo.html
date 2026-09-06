@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKADUX — Brand Identity & Typography Design Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&family=Chakra+Petch:wght@500;700&family=Unbounded:wght@700;800;900&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --surface: #0e131f;
+      --surface-border: rgba(255, 255, 255, 0.08);
+      --surface-hover: #141b2d;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-1: #00f2fe;
+      --accent-2: #4facfe;
+      --accent-glow: rgba(0, 242, 254, 0.25);
+      --current-font: 'Space Grotesk', sans-serif;
+      --current-spacing: 4px;
+      --current-weight: 800;
+    }
+
+    /* Themes */
+    body.theme-light {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-border: rgba(0, 0, 0, 0.08);
+      --surface-hover: #f1f5f9;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --accent-glow: rgba(0, 242, 254, 0.15);
+    }
+    body.theme-blueprint {
+      --bg: #0a1128;
+      --surface: #0e1c3e;
+      --surface-border: rgba(79, 172, 254, 0.18);
+      --surface-hover: #13244e;
+      --text: #ffffff;
+      --text-muted: #8eb3e6;
+    }
+
+    /* Palettes */
+    body.palette-emerald {
+      --accent-1: #10b981;
+      --accent-2: #06b6d4;
+      --accent-glow: rgba(16, 185, 129, 0.25);
+    }
+    body.palette-violet {
+      --accent-1: #a855f7;
+      --accent-2: #6366f1;
+      --accent-glow: rgba(168, 85, 247, 0.25);
+    }
+    body.palette-amber {
+      --accent-1: #f59e0b;
+      --accent-2: #ef4444;
+      --accent-glow: rgba(245, 158, 11, 0.25);
+    }
+    body.palette-mono {
+      --accent-1: #ffffff;
+      --accent-2: #94a3b8;
+      --accent-glow: rgba(255, 255, 255, 0.2);
+    }
+    body.theme-light.palette-mono {
+      --accent-1: #0f172a;
+      --accent-2: #475569;
+      --accent-glow: rgba(15, 23, 42, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header Bar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(var(--bg), 0.85);
+      border-bottom: 1px solid var(--surface-border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .brand-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--surface-hover);
+      border: 1px solid var(--surface-border);
+      color: var(--accent-1);
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+
+    .controls-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .control-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .pill-select {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      padding: 3px;
+      border-radius: 8px;
+      gap: 2px;
+    }
+
+    .pill-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pill-btn:hover {
+      color: var(--text);
+    }
+
+    .pill-btn.active {
+      background: var(--surface-hover);
+      color: var(--text);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .color-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .color-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .color-dot:hover {
+      transform: scale(1.15);
+    }
+
+    .color-dot.active {
+      border-color: var(--text);
+      transform: scale(1.15);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 36px 28px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    /* Typography Control Panel */
+    .typo-panel {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .typo-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .typo-row-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-1);
+      min-width: 130px;
+    }
+
+    .chip-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .chip-btn {
+      background: var(--surface-hover);
+      border: 1px solid var(--surface-border);
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chip-btn:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .chip-btn.active {
+      background: var(--accent-1);
+      color: #07090e;
+      font-weight: 700;
+      border-color: var(--accent-1);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    /* Concept Selector Tabs */
+    .concept-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .concept-card-tab {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .concept-card-tab:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .concept-card-tab.active {
+      border-color: var(--accent-1);
+      background: var(--surface-hover);
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+
+    .tab-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-1);
+      letter-spacing: 1px;
+    }
+
+    .tab-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .tab-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Showcase Hero Section */
+    .showcase-hero {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 20px;
+      padding: 64px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    .hero-glow-bg {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+      filter: blur(60px);
+      z-index: 0;
+      transition: all 0.5s ease;
+    }
+
+    .logo-hero-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Lockup Styles */
+    .logo-lockup-horizontal {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo-lockup-vertical {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+
+    .wordmark-text {
+      font-family: var(--current-font);
+      font-weight: var(--current-weight);
+      letter-spacing: var(--current-spacing);
+      line-height: 1;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .wordmark-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .interactive-toolbar {
+      margin-top: 36px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 2;
+    }
+
+    .btn-action {
+      background: var(--surface-hover);
+      border: 1px solid var(--surface-border);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .btn-action svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    /* Section Titles */
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--accent-1);
+    }
+
+    /* Font Comparison Matrix */
+    .font-matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
+    }
+
+    .font-matrix-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .font-matrix-card:hover {
+      border-color: rgba(255,255,255,0.25);
+      transform: translateY(-2px);
+    }
+
+    .font-matrix-card.active {
+      border-color: var(--accent-1);
+      background: var(--surface-hover);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .font-meta-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .font-name-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .font-tag {
+      font-size: 11px;
+      background: var(--surface-hover);
+      border: 1px solid var(--surface-border);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--accent-1);
+    }
+
+    .font-preview-box {
+      font-size: 32px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Inverted & Monotone Previews */
+    .grid-variations {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .variant-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      position: relative;
+    }
+
+    .variant-label {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .card-dark-pure {
+      background: #000000;
+      border-color: #222222;
+    }
+    .card-light-pure {
+      background: #ffffff;
+      border-color: #e2e8f0;
+      color: #0f172a;
+    }
+
+    /* Mockups Grid */
+    .grid-mockups {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 24px;
+    }
+
+    .mockup-window {
+      background: #0b0f19;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 16px 32px rgba(0,0,0,0.4);
+    }
+
+    .mockup-header {
+      background: #111726;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .window-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .mockup-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #64748b;
+      margin-left: 8px;
+    }
+
+    .mockup-body-terminal {
+      padding: 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    .cli-prompt {
+      color: #38bdf8;
+    }
+    .cli-success {
+      color: #4ade80;
+    }
+
+    .mockup-navbar {
+      background: rgba(15, 23, 42, 0.95);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .nav-links span.active {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #38bdf8;
+      border: 1px solid #38bdf8;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      box-shadow: 0 10px 25px rgba(0, 242, 254, 0.2);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 12px 16px;
+      }
+      main {
+        padding: 24px 16px;
+      }
+      .showcase-hero {
+        padding: 40px 16px;
+      }
+      .logo-lockup-horizontal {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body class="palette-cyan">
+
+  <!-- Header Bar -->
+  <header>
+    <div class="brand-meta">
+      <span class="brand-badge">Typography Studio</span>
+      <span class="brand-title">SKADUX — Spelling, Font & Style Engine</span>
+    </div>
+
+    <div class="controls-group">
+      <!-- Theme Switcher -->
+      <span class="control-label">Canvas:</span>
+      <div class="pill-select">
+        <button class="pill-btn active" onclick="setTheme('dark', this)">Onyx</button>
+        <button class="pill-btn" onclick="setTheme('blueprint', this)">Blueprint</button>
+        <button class="pill-btn" onclick="setTheme('light', this)">Light</button>
+      </div>
+
+      <!-- Accent Color Palette -->
+      <span class="control-label" style="margin-left: 8px;">Accent:</span>
+      <div class="color-dots">
+        <div class="color-dot active" style="background: linear-gradient(135deg, #00f2fe, #4facfe);" title="Cyan Electric" onclick="setPalette('cyan', this)"></div>
+        <div class="color-dot" style="background: linear-gradient(135deg, #10b981, #06b6d4);" title="Hyper Emerald" onclick="setPalette('emerald', this)"></div>
+        <div class="color-dot" style="background: linear-gradient(135deg, #a855f7, #6366f1);" title="Radiant Violet" onclick="setPalette('violet', this)"></div>
+        <div class="color-dot" style="background: linear-gradient(135deg, #f59e0b, #ef4444);" title="Solar Amber" onclick="setPalette('amber', this)"></div>
+        <div class="color-dot" style="background: linear-gradient(135deg, #ffffff, #64748b);" title="Monochrome" onclick="setPalette('mono', this)"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- Interactive Typography & Style Controller -->
+    <section class="typo-panel">
+      <!-- Font Family -->
+      <div class="typo-row">
+        <span class="typo-row-title">Font Family:</span>
+        <div class="chip-group">
+          <button class="chip-btn active" onclick="setFontFamily('Space Grotesk', this)">Space Grotesk (Geometric Tech)</button>
+          <button class="chip-btn" onclick="setFontFamily('Syne', this)">Syne (Avant-Garde Precision)</button>
+          <button class="chip-btn" onclick="setFontFamily('Chakra Petch', this)">Chakra Petch (Cyber Architectural)</button>
+          <button class="chip-btn" onclick="setFontFamily('Unbounded', this)">Unbounded (Heavy Industrial)</button>
+          <button class="chip-btn" onclick="setFontFamily('Plus Jakarta Sans', this)">Plus Jakarta (Neo-Grotesk)</button>
+          <button class="chip-btn" onclick="setFontFamily('JetBrains Mono', this)">JetBrains Mono (Code/Terminal)</button>
+        </div>
+      </div>
+
+      <!-- Spelling & Letterform Treatment -->
+      <div class="typo-row">
+        <span class="typo-row-title">Spelling Treatment:</span>
+        <div class="chip-group">
+          <button class="chip-btn active" onclick="setSpellingStyle('standard', this)">SKADUX (All-Caps Clean)</button>
+          <button class="chip-btn" onclick="setSpellingStyle('cyber-apex', this)">SKΛDUX (Apex Crossbar-Free)</button>
+          <button class="chip-btn" onclick="setSpellingStyle('accent-x', this)">SKADU<span style="color:var(--accent-1)">X</span> (Accent Focal X)</button>
+          <button class="chip-btn" onclick="setSpellingStyle('spaced', this)">S · K · A · D · U · X (Architectural Wide)</button>
+          <button class="chip-btn" onclick="setSpellingStyle('title', this)">Skadux (Modern Title Case)</button>
+          <button class="chip-btn" onclick="setSpellingStyle('lower', this)">skadux (Minimalist Lowercase)</button>
+        </div>
+      </div>
+
+      <!-- Letter Spacing & Weight -->
+      <div class="typo-row">
+        <span class="typo-row-title">Letter Spacing:</span>
+        <div class="chip-group">
+          <button class="chip-btn" onclick="setTracking('0px', this)">Tight (0px)</button>
+          <button class="chip-btn active" onclick="setTracking('4px', this)">Balanced (4px)</button>
+          <button class="chip-btn" onclick="setTracking('8px', this)">Wide (8px)</button>
+          <button class="chip-btn" onclick="setTracking('12px', this)">Ultra-Wide (12px)</button>
+        </div>
+
+        <span class="typo-row-title" style="min-width: 60px; margin-left: 20px;">Weight:</span>
+        <div class="chip-group">
+          <button class="chip-btn" onclick="setWeight(600, this)">600 SemiBold</button>
+          <button class="chip-btn active" onclick="setWeight(800, this)">800 ExtraBold</button>
+          <button class="chip-btn" onclick="setWeight(900, this)">900 Black</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Logo Concept Selector Tabs -->
+    <div class="concept-nav">
+      <div class="concept-card-tab active" onclick="selectConcept(0, this)">
+        <span class="tab-num">CONCEPT 01</span>
+        <span class="tab-name">Quantum Hex-Core</span>
+        <span class="tab-desc">Architectural isometric 'S' woven with precision flow channels.</span>
+      </div>
+
+      <div class="concept-card-tab" onclick="selectConcept(1, this)">
+        <span class="tab-num">CONCEPT 02</span>
+        <span class="tab-name">Velocity Kinetic</span>
+        <span class="tab-desc">Dual forward chevrons forming an 'S' and precision release vector.</span>
+      </div>
+
+      <div class="concept-card-tab" onclick="selectConcept(2, this)">
+        <span class="tab-num">CONCEPT 03</span>
+        <span class="tab-name">Hyper-Loop Nexus</span>
+        <span class="tab-desc">Continuous Möbius intelligence curve with dynamic energy core.</span>
+      </div>
+
+      <div class="concept-card-tab" onclick="selectConcept(3, this)">
+        <span class="tab-num">CONCEPT 04</span>
+        <span class="tab-name">Monolith Prism</span>
+        <span class="tab-desc">3D faceted structural gemstone symbolizing unbreakable release integrity.</span>
+      </div>
+
+      <div class="concept-card-tab" onclick="selectConcept(4, this)">
+        <span class="tab-num">CONCEPT 05</span>
+        <span class="tab-name">Sovereign Shield</span>
+        <span class="tab-desc">Hexagonal perimeter with isolated core node for enterprise governance.</span>
+      </div>
+    </div>
+
+    <!-- Hero Display Stage -->
+    <section class="showcase-hero">
+      <div class="hero-glow-bg" id="heroGlow"></div>
+
+      <div class="logo-hero-container" id="heroLogoContainer">
+        <!-- Injected via JavaScript based on active concept -->
+      </div>
+
+      <div class="interactive-toolbar">
+        <button class="btn-action" onclick="toggleOrientation()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M12 4v16"/></svg>
+          <span id="orientationLabel">Switch to Stacked</span>
+        </button>
+        <button class="btn-action" onclick="copyCurrentSVG()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy Full SVG Lockup</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Side-by-Side Font Family Comparison Matrix -->
+    <section>
+      <div class="section-title">
+        <span>01 / TYPOGRAPHY COMPARISON MATRIX</span> All Font Personalities Side-by-Side
+      </div>
+      <div class="font-matrix-grid" id="fontMatrixContainer">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- Color & Surface Testing Variations -->
+    <section>
+      <div class="section-title">
+        <span>02 / CONTRAST TESTING</span> Surface Variations & Monochrome Inversions
+      </div>
+      <div class="grid-variations">
+        <!-- Deep Black Variant -->
+        <div class="variant-card card-dark-pure">
+          <span class="variant-label">OLED Black (Pitch Dark)</span>
+          <div id="variantDarkPure"></div>
+        </div>
+
+        <!-- Pure White Variant -->
+        <div class="variant-card card-light-pure">
+          <span class="variant-label" style="color: #64748b;">Clean Canvas (White)</span>
+          <div id="variantLightPure"></div>
+        </div>
+
+        <!-- Solid Inverted Mark -->
+        <div class="variant-card" style="background: var(--surface-hover);">
+          <span class="variant-label">Monochrome Glyph Mark</span>
+          <div id="variantMonochrome"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Real-World Digital Context Applications -->
+    <section>
+      <div class="section-title">
+        <span>03 / CONTEXTUAL APPLICATION</span> Real-World Platform Environments
+      </div>
+      <div class="grid-mockups">
+
+        <!-- Mockup: CLI Terminal -->
+        <div class="mockup-window">
+          <div class="mockup-header">
+            <div class="window-dot dot-red"></div>
+            <div class="window-dot dot-yellow"></div>
+            <div class="window-dot dot-green"></div>
+            <span class="mockup-title">zsh — skadux-cli — 80x24</span>
+          </div>
+          <div class="mockup-body-terminal">
+            <p><span class="cli-prompt">$</span> skadux run --all --suite=release-gate</p>
+            <p style="color: #64748b; margin: 4px 0;">[SKADUX Core v2.4.0 • Autonomous Quality Engine]</p>
+            <p style="margin-top: 8px;">✔ Requirement Analysis: <span class="cli-success">Aligned (1,420 spec nodes)</span></p>
+            <p>✔ Autonomous Test Synthesis: <span class="cli-success">3,892 test suites generated</span></p>
+            <p>✔ Distributed Cluster Execution: <span class="cli-success">0 flakiness detected</span></p>
+            <p>✔ Release Gate Integrity: <span class="cli-success">PASSED (Score: 99.8%)</span></p>
+            <p style="margin-top: 12px; color: var(--accent-1); font-weight: 600;">✨ Ready for production deployment with SKADUX</p>
+          </div>
+        </div>
+
+        <!-- Mockup: Enterprise Platform Header -->
+        <div class="mockup-window" style="display: flex; flex-direction: column;">
+          <div class="mockup-header">
+            <div class="window-dot dot-red"></div>
+            <div class="window-dot dot-yellow"></div>
+            <div class="window-dot dot-green"></div>
+            <span class="mockup-title">https://console.skadux.com</span>
+          </div>
+          <div class="mockup-navbar">
+            <div id="mockupNavLogo"></div>
+            <div class="nav-links">
+              <span class="active">Pipelines</span>
+              <span>Test Suites</span>
+              <span>AI Diagnostics</span>
+              <span>Releases</span>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px;">
+              US-EAST-1
+            </div>
+          </div>
+          <div style="padding: 32px 24px; flex: 1; display: flex; align-items: center; justify-content: center; background: #070a12;">
+            <span style="font-size: 13px; color: #475569; font-family: 'JetBrains Mono', monospace;">
+              [Enterprise Quality Intelligence Dashboard Active]
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast">SVG lockup copied to clipboard!</div>
+
+  <script>
+    // State
+    let activeIndex = 0;
+    let isStacked = false;
+    let currentFont = "'Space Grotesk', sans-serif";
+    let currentFontName = "Space Grotesk";
+    let currentStyle = 'standard';
+    let currentSpacing = '4px';
+    let currentWeight = 800;
+
+    const fontOptions = [
+      { name: 'Space Grotesk', font: "'Space Grotesk', sans-serif", tag: 'Geometric Tech' },
+      { name: 'Syne', font: "'Syne', sans-serif", tag: 'Avant-Garde Precision' },
+      { name: 'Chakra Petch', font: "'Chakra Petch', sans-serif", tag: 'Cyber Tactical' },
+      { name: 'Unbounded', font: "'Unbounded', sans-serif", tag: 'Heavy Industrial' },
+      { name: 'Plus Jakarta Sans', font: "'Plus Jakarta Sans', sans-serif", tag: 'Enterprise Neo-Grotesk' },
+      { name: 'JetBrains Mono', font: "'JetBrains Mono', monospace", tag: 'Code Infrastructure' }
+    ];
+
+    // Concept Definitions with SVG Marks
+    const concepts = [
+      {
+        id: "concept-1",
+        name: "Quantum Hex-Core",
+        sub: "Autonomous Intelligence",
+        renderSVG: (size = 80, isLight = false, colorOverride = null) => {
+          const c1 = colorOverride || 'var(--accent-1)';
+          const c2 = colorOverride || 'var(--accent-2)';
+          const darkTone = isLight ? '#0f172a' : '#ffffff';
+          return `
+            <svg class="svg-mark" width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="g1_${size}_${isLight}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="${c1}" />
+                  <stop offset="100%" stop-color="${c2}" />
+                </linearGradient>
+                <linearGradient id="g1_core_${size}" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="${c2}" stop-opacity="0.8" />
+                  <stop offset="100%" stop-color="${c1}" />
+                </linearGradient>
+              </defs>
+              <path d="M50 12 L78 28 L78 44 L50 28 L22 44 L22 28 Z" fill="url(#g1_${size}_${isLight})" />
+              <path d="M22 44 L50 28 L78 44 L50 60 L22 44 Z" fill="${darkTone}" fill-opacity="${isLight ? '0.85' : '0.9'}" />
+              <path d="M50 40 L68 50 L50 60 L32 50 Z" fill="url(#g1_core_${size})" />
+              <path d="M78 56 L78 72 L50 88 L22 72 L22 56 L50 72 Z" fill="url(#g1_${size}_${isLight})" />
+              <circle cx="50" cy="12" r="3.5" fill="${c1}" />
+              <circle cx="78" cy="72" r="3.5" fill="${c2}" />
+              <circle cx="22" cy="28" r="3.5" fill="${c1}" />
+              <circle cx="50" cy="88" r="3.5" fill="${c2}" />
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "concept-2",
+        name: "Velocity Kinetic",
+        sub: "Continuous Velocity",
+        renderSVG: (size = 80, isLight = false, colorOverride = null) => {
+          const c1 = colorOverride || 'var(--accent-1)';
+          const c2 = colorOverride || 'var(--accent-2)';
+          const fillMid = isLight ? '#0f172a' : '#f8fafc';
+          return `
+            <svg class="svg-mark" width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="g2_${size}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="${c1}" />
+                  <stop offset="100%" stop-color="${c2}" />
+                </linearGradient>
+              </defs>
+              <path d="M20 22 L65 22 L82 38 L45 38 L30 52 L75 52 L58 66 L20 66 Z" fill="url(#g2_${size})" />
+              <path d="M80 78 L35 78 L18 62 L55 62 L70 48 L25 48 L42 34 L80 34 Z" fill="${fillMid}" fill-opacity="${isLight ? '0.9' : '0.85'}" />
+              <circle cx="82" cy="38" r="4" fill="${c1}" />
+              <circle cx="18" cy="62" r="4" fill="${c2}" />
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "concept-3",
+        name: "Hyper-Loop Nexus",
+        sub: "Continuous Verification",
+        renderSVG: (size = 80, isLight = false, colorOverride = null) => {
+          const c1 = colorOverride || 'var(--accent-1)';
+          const c2 = colorOverride || 'var(--accent-2)';
+          return `
+            <svg class="svg-mark" width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="g3_${size}" x1="15%" y1="15%" x2="85%" y2="85%">
+                  <stop offset="0%" stop-color="${c1}" />
+                  <stop offset="50%" stop-color="${c2}" />
+                  <stop offset="100%" stop-color="${c1}" />
+                </linearGradient>
+              </defs>
+              <path d="M72 26 C82 38, 78 52, 58 56 C38 60, 20 62, 24 76 C28 90, 48 88, 64 82 C72 79, 78 74, 80 68" 
+                    stroke="url(#g3_${size})" stroke-width="12" stroke-linecap="round" fill="none" />
+              <path d="M28 74 C18 62, 22 48, 42 44 C62 40, 80 38, 76 24 C72 10, 52 12, 36 18 C28 21, 22 26, 20 32" 
+                    stroke="${isLight ? '#0f172a' : '#ffffff'}" stroke-width="11" stroke-linecap="round" stroke-opacity="${isLight ? '0.85' : '0.9'}" fill="none" />
+              <circle cx="50" cy="50" r="6" fill="${c1}" />
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "concept-4",
+        name: "Monolith Prism",
+        sub: "Sovereign Architecture",
+        renderSVG: (size = 80, isLight = false, colorOverride = null) => {
+          const c1 = colorOverride || 'var(--accent-1)';
+          const c2 = colorOverride || 'var(--accent-2)';
+          return `
+            <svg class="svg-mark" width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="g4_top_${size}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="${c1}" />
+                  <stop offset="100%" stop-color="${c2}" />
+                </linearGradient>
+                <linearGradient id="g4_bot_${size}" x1="100%" y1="100%" x2="0%" y2="0%">
+                  <stop offset="0%" stop-color="${c2}" />
+                  <stop offset="100%" stop-color="${c1}" />
+                </linearGradient>
+              </defs>
+              <polygon points="50,14 80,32 50,48 20,32" fill="url(#g4_top_${size})" />
+              <polygon points="20,32 50,48 50,66 20,50" fill="${isLight ? '#1e293b' : '#334155'}" />
+              <polygon points="50,48 80,32 80,50 50,66" fill="${isLight ? '#0f172a' : '#1e293b'}" />
+              <polygon points="50,66 80,50 80,68 50,86" fill="url(#g4_bot_${size})" />
+              <polygon points="20,50 50,66 50,86 20,68" fill="${c1}" fill-opacity="0.85" />
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "concept-5",
+        name: "Sovereign Shield",
+        sub: "Security & Governance",
+        renderSVG: (size = 80, isLight = false, colorOverride = null) => {
+          const c1 = colorOverride || 'var(--accent-1)';
+          const c2 = colorOverride || 'var(--accent-2)';
+          return `
+            <svg class="svg-mark" width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="g5_${size}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="${c1}" />
+                  <stop offset="100%" stop-color="${c2}" />
+                </linearGradient>
+              </defs>
+              <polygon points="50,10 86,28 86,68 50,90 14,68 14,28" 
+                       stroke="url(#g5_${size})" stroke-width="6" stroke-linejoin="round" fill="none" />
+              <path d="M68 32 L36 32 C30 32, 28 38, 34 42 L66 54 C72 58, 70 68, 64 68 L32 68" 
+                    stroke="${isLight ? '#0f172a' : '#ffffff'}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+              <circle cx="50" cy="48" r="5" fill="${c1}" />
+            </svg>
+          `;
+        }
+      }
+    ];
+
+    // Format text based on spelling style
+    function getStyledText(style = currentStyle) {
+      switch(style) {
+        case 'cyber-apex':
+          return 'SKΛDUX';
+        case 'accent-x':
+          return `SKADU<span style="color:var(--accent-1)">X</span>`;
+        case 'spaced':
+          return 'S · K · A · D · U · X';
+        case 'title':
+          return 'Skadux';
+        case 'lower':
+          return 'skadux';
+        case 'standard':
+        default:
+          return 'SKADUX';
+      }
+    }
+
+    function renderActiveHero() {
+      const c = concepts[activeIndex];
+      const container = document.getElementById('heroLogoContainer');
+      const size = isStacked ? 110 : 84;
+      const fontSize = isStacked ? '44px' : '40px';
+      const lockupClass = isStacked ? 'logo-lockup-vertical' : 'logo-lockup-horizontal';
+
+      container.innerHTML = `
+        <div class="${lockupClass}">
+          ${c.renderSVG(size, document.body.classList.contains('theme-light'))}
+          <div style="display: flex; flex-direction: column; ${isStacked ? 'align-items: center;' : ''}">
+            <div class="wordmark-text" style="font-family: ${currentFont}; font-size: ${fontSize}; font-weight: ${currentWeight}; letter-spacing: ${currentSpacing};">
+              ${getStyledText()}
+            </div>
+            <div class="wordmark-sub">
+              ${c.sub}
+            </div>
+          </div>
+        </div>
+      `;
+
+      renderFontMatrix();
+      renderVariations();
+      renderMockups();
+    }
+
+    function renderFontMatrix() {
+      const c = concepts[activeIndex];
+      const container = document.getElementById('fontMatrixContainer');
+      
+      container.innerHTML = fontOptions.map((item) => `
+        <div class="font-matrix-card ${currentFontName === item.name ? 'active' : ''}" onclick="selectFontFromCard('${item.name}')">
+          <div class="font-meta-header">
+            <span class="font-name-label">${item.name}</span>
+            <span class="font-tag">${item.tag}</span>
+          </div>
+          <div class="font-preview-box">
+            ${c.renderSVG(40, document.body.classList.contains('theme-light'))}
+            <span style="font-family: ${item.font}; font-weight: ${currentWeight}; letter-spacing: ${currentSpacing};">
+              ${getStyledText()}
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderVariations() {
+      const c = concepts[activeIndex];
+      document.getElementById('variantDarkPure').innerHTML = `
+        <div style="display:flex; align-items:center; gap:16px;">
+          ${c.renderSVG(50, false)}
+          <span style="font-family:${currentFont}; font-weight:${currentWeight}; letter-spacing:${currentSpacing}; font-size:24px; color:#ffffff;">${getStyledText()}</span>
+        </div>
+      `;
+
+      document.getElementById('variantLightPure').innerHTML = `
+        <div style="display:flex; align-items:center; gap:16px;">
+          ${c.renderSVG(50, true, '#0f172a')}
+          <span style="font-family:${currentFont}; font-weight:${currentWeight}; letter-spacing:${currentSpacing}; font-size:24px; color:#0f172a;">${getStyledText()}</span>
+        </div>
+      `;
+
+      document.getElementById('variantMonochrome').innerHTML = `
+        <div style="display:flex; align-items:center; gap:20px;">
+          ${c.renderSVG(52, false, '#ffffff')}
+          <div style="font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-muted); line-height:1.5;">
+            Single-Color Glyph<br/>Ready for Stencils & Emboss
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMockups() {
+      const c = concepts[activeIndex];
+      document.getElementById('mockupNavLogo').innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px;">
+          ${c.renderSVG(26, false)}
+          <span style="font-family:${currentFont}; font-weight:${currentWeight}; letter-spacing:2px; font-size:15px; color:#ffffff;">${getStyledText()}</span>
+        </div>
+      `;
+    }
+
+    // Handlers
+    function setFontFamily(fontName, btn) {
+      currentFontName = fontName;
+      const found = fontOptions.find(f => f.name === fontName);
+      if (found) currentFont = found.font;
+      document.documentElement.style.setProperty('--current-font', currentFont);
+
+      if (btn) {
+        btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      renderActiveHero();
+    }
+
+    function selectFontFromCard(fontName) {
+      currentFontName = fontName;
+      const found = fontOptions.find(f => f.name === fontName);
+      if (found) currentFont = found.font;
+      document.documentElement.style.setProperty('--current-font', currentFont);
+
+      // Update chips
+      document.querySelectorAll('.typo-panel .chip-btn').forEach(b => {
+        if (b.innerText.includes(fontName)) {
+          b.parentElement.querySelectorAll('.chip-btn').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+        }
+      });
+
+      renderActiveHero();
+    }
+
+    function setSpellingStyle(style, btn) {
+      currentStyle = style;
+      btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderActiveHero();
+    }
+
+    function setTracking(spacing, btn) {
+      currentSpacing = spacing;
+      document.documentElement.style.setProperty('--current-spacing', spacing);
+      btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderActiveHero();
+    }
+
+    function setWeight(weight, btn) {
+      currentWeight = weight;
+      document.documentElement.style.setProperty('--current-weight', weight);
+      btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderActiveHero();
+    }
+
+    function selectConcept(index, elem) {
+      activeIndex = index;
+      document.querySelectorAll('.concept-card-tab').forEach(t => t.classList.remove('active'));
+      elem.classList.add('active');
+      renderActiveHero();
+    }
+
+    function toggleOrientation() {
+      isStacked = !isStacked;
+      document.getElementById('orientationLabel').innerText = isStacked ? 'Switch to Horizontal' : 'Switch to Stacked';
+      renderActiveHero();
+    }
+
+    function setTheme(theme, btn) {
+      document.body.classList.remove('theme-light', 'theme-blueprint');
+      if (theme === 'light') document.body.classList.add('theme-light');
+      if (theme === 'blueprint') document.body.classList.add('theme-blueprint');
+
+      btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderActiveHero();
+    }
+
+    function setPalette(palette, dot) {
+      document.body.classList.remove('palette-cyan', 'palette-emerald', 'palette-violet', 'palette-amber', 'palette-mono');
+      document.body.classList.add('palette-' + palette);
+
+      dot.parentElement.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+      renderActiveHero();
+    }
+
+    function copyCurrentSVG() {
+      const c = concepts[activeIndex];
+      const svgCode = c.renderSVG(100, false);
+      navigator.clipboard.writeText(svgCode).then(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      });
+    }
+
+    // Initial Render
+    renderActiveHero();
+  </script>
+</body>
+</html>

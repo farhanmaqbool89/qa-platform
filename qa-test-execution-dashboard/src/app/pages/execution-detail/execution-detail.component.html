@@ -1,0 +1,226 @@
+<section class="execution-detail-page">
+
+  <!-- EXECUTION METADATA & CONTROL BAR -->
+  <mat-card class="execution-card" *ngIf="execution$ | async as exec">
+    <mat-card-header>
+      <div class="header-content">
+        <div>
+          <mat-card-title>Execution Run #{{ exec.id }}</mat-card-title>
+          <mat-card-subtitle>{{ exec.projectName }} — {{ exec.featureName }}</mat-card-subtitle>
+        </div>
+        
+        <div class="header-actions">
+          <!-- PROCEDURE UNDERWAY LOADER BADGE -->
+          <div class="procedure-badge" *ngIf="exec.status === 'Running'">
+            <mat-progress-spinner mode="indeterminate" diameter="16" color="accent"></mat-progress-spinner>
+            <span class="pulse-dot"></span>
+            <span class="procedure-text">Procedure Underway</span>
+          </div>
+
+          <span class="status-pill" [ngClass]="'status-' + (exec.status || 'passed').toLowerCase()">
+            {{ exec.status }}
+          </span>
+
+          <button
+            mat-flat-button
+            color="warn"
+            class="cancel-btn"
+            *ngIf="exec.status === 'Running'"
+            (click)="cancelExecution()"
+            [disabled]="isCancelling"
+          >
+            <mat-icon>cancel</mat-icon>
+            {{ isCancelling ? 'Cancelling...' : 'Cancel Execution' }}
+          </button>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Environment</span>
+          <span class="meta-val">{{ exec.environment }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Duration</span>
+          <span class="meta-val">{{ exec.durationSeconds }}s</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Started At</span>
+          <span class="meta-val">{{ exec.startedAt | date:'medium' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Git Branch</span>
+          <span class="meta-val">🌿 main</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- AI FAILURE DIAGNOSIS CARD -->
+  <app-ai-failure-card
+    *ngIf="(execution$ | async)?.status === 'Failed'"
+    [executionId]="executionIdStr"
+  ></app-ai-failure-card>
+
+  <!-- UNIFIED ARTIFACT & TELEMETRY TABS -->
+  <mat-card class="artifacts-card">
+    <mat-tab-group animationDuration="200ms" class="styled-tabs">
+      
+      <!-- TAB 1: STREAMED STEP LOGS -->
+      <mat-tab label="Live Step Logs">
+        <div class="tab-content">
+          <div class="logs-panel" #detailLogsContainer (scroll)="onLogsScroll()" *ngIf="logs$ | async as logs">
+            <div class="log-entry" *ngFor="let log of logs" [ngClass]="log.type">
+              <span class="log-time" *ngIf="log.timestamp">[{{ log.timestamp }}]</span>
+              <span class="log-message">{{ log.message }}</span>
+            </div>
+            <div class="empty-logs" *ngIf="logs.length === 0">
+              <p>No log entries streamed for this execution yet.</p>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- TAB 2: STEP & FAILURE SCREENSHOTS -->
+      <mat-tab>
+        <ng-template matTabLabel>
+          <span>Screenshots</span>
+          <span class="count-badge" *ngIf="artifacts.screenshots.length">{{ artifacts.screenshots.length }}</span>
+        </ng-template>
+        <div class="tab-content">
+          <div class="screenshots-grid" *ngIf="artifacts.screenshots.length > 0; else noScreenshots">
+            <div class="screenshot-card" *ngFor="let shot of artifacts.screenshots; let i = index">
+              <div class="img-wrapper">
+                <img [src]="shot" [alt]="'Screenshot ' + (i + 1)">
+              </div>
+              <div class="img-caption">
+                <span>Step {{ i + 1 }} Screenshot</span>
+                <a [href]="shot" target="_blank" download class="dl-btn">
+                  <mat-icon>download</mat-icon>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noScreenshots>
+            <div class="empty-state">
+              <mat-icon>image_not_supported</mat-icon>
+              <p>No screenshot artifacts captured for this execution.</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+
+      <!-- TAB 3: VIDEO PLAYBACK -->
+      <mat-tab label="Video Recording">
+        <div class="tab-content">
+          <div class="video-container" *ngIf="artifacts.videos.length > 0; else noVideos">
+            <video controls [src]="artifacts.videos[0]" class="video-player">
+              Your browser does not support HTML5 video playback.
+            </video>
+          </div>
+
+          <ng-template #noVideos>
+            <div class="empty-state">
+              <mat-icon>videocam_off</mat-icon>
+              <p>No video recording captured for this execution.</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+
+      <!-- TAB 4: PLAYWRIGHT TRACE DOWNLOAD -->
+      <mat-tab label="Playwright Trace">
+        <div class="tab-content">
+          <div class="trace-card" *ngIf="artifacts.traces.length > 0; else noTraces">
+            <div class="trace-info">
+              <mat-icon class="trace-icon">analytics</mat-icon>
+              <div>
+                <h4>Playwright Execution Trace (.zip)</h4>
+                <p>Contains full DOM snapshots, network payloads, console logs, and action timelines.</p>
+              </div>
+            </div>
+            <a [href]="artifacts.traces[0]" download class="dl-trace-btn">
+              <mat-icon>download</mat-icon>
+              Download Trace Package
+            </a>
+          </div>
+
+          <ng-template #noTraces>
+            <div class="empty-state">
+              <mat-icon>folder_off</mat-icon>
+              <p>No Playwright trace file generated for this execution.</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+
+      <!-- TAB 5: EMBEDDED WCAG ACCESSIBILITY SCAN -->
+      <mat-tab>
+        <ng-template matTabLabel>
+          <span>WCAG Accessibility</span>
+          <span class="score-pill" *ngIf="artifacts.accessibility" [ngClass]="{'high': artifacts.accessibility.score >= 80, 'low': artifacts.accessibility.score < 80}">
+            {{ artifacts.accessibility.score }}/100
+          </span>
+        </ng-template>
+
+        <div class="tab-content">
+          <div class="a11y-unified-report" *ngIf="artifacts.accessibility; else noA11y">
+            
+            <!-- Summary Header -->
+            <div class="a11y-summary-header">
+              <div class="a11y-score-box" [ngClass]="{'high': artifacts.accessibility.score >= 80, 'low': artifacts.accessibility.score < 80}">
+                <span class="score-num">{{ artifacts.accessibility.score }}</span>
+                <span class="score-lbl">WCAG Score</span>
+              </div>
+
+              <div class="a11y-summary-meta">
+                <h3>{{ artifacts.accessibility.targetTitle }}</h3>
+                <p class="a11y-url">{{ artifacts.accessibility.url }}</p>
+                <div class="a11y-tags">
+                  <span class="a11y-badge">{{ artifacts.accessibility.standard }}</span>
+                  <span class="crit-badge" *ngIf="artifacts.accessibility.summary?.criticalCount > 0">
+                    ⚠ {{ artifacts.accessibility.summary?.criticalCount }} Critical Issues
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Violations Breakdown -->
+            <div class="violations-list" *ngIf="artifacts.accessibility.criticalIssues?.length > 0">
+              <h4>Critical & Serious Accessibility Violations</h4>
+
+              <div class="rule-card" *ngFor="let rule of artifacts.accessibility.criticalIssues">
+                <div class="rule-header">
+                  <span class="impact-pill impact-critical">CRITICAL</span>
+                  <strong class="rule-title">{{ rule.help }}</strong>
+                  <code>{{ rule.id }}</code>
+                </div>
+                <p class="rule-desc">{{ rule.description }}</p>
+
+                <div class="affected-nodes" *ngIf="rule.nodes?.length > 0">
+                  <span class="nodes-lbl">Target DOM Selectors:</span>
+                  <div class="node-item" *ngFor="let node of rule.nodes">
+                    <code>{{ node.target.join(' > ') }}</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <ng-template #noA11y>
+            <div class="empty-state">
+              <mat-icon>accessibility</mat-icon>
+              <p>No embedded accessibility scan was executed for this scenario run.</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </mat-card>
+
+</section>

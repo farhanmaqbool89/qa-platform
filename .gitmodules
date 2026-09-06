@@ -1,7 +1,3 @@
-[submodule "qa-backend"]
-    path = qa-backend
-    url = https://github.com/farhanmaqbool89/qa-backend
-
-[submodule "qa-test-execution-dashboard"]
-    path = qa-test-execution-dashboard
-    url = https://github.com/farhanmaqbool89/qa-dashboard
+# Git submodules have been removed.
+# The qa-test-execution-dashboard Angular frontend is now tracked directly in this repository.
+# The qa-backend is not required for Cloudflare Pages frontend deployment.

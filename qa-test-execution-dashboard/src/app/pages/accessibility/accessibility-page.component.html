@@ -1,0 +1,670 @@
+<section class="accessibility-page">
+
+  <!-- 🌟 DASHBOARD TOP HEADER BAR -->
+  <div class="page-top-header">
+    <div class="header-titles">
+      <div class="title-with-icon">
+        <mat-icon class="page-icon">accessibility_new</mat-icon>
+        <h1 class="page-title">{{ activeReport ? getStandardTitle() + ' Compliance Report' : 'WCAG Accessibility Audit
+          Center' }}</h1>
+      </div>
+      <p class="page-subtitle">
+        Automated & Executive Assessment across Perceivable, Operable, Understandable & Robust Principles
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button mat-stroked-button color="warn" *ngIf="activeReport" (click)="clearActiveReport()"
+        class="clear-report-btn">
+        <mat-icon>close</mat-icon> Clear Active Report
+      </button>
+
+      <button mat-stroked-button class="toggle-engine-btn" (click)="toggleAuditEngine()">
+        <mat-icon>{{ showAuditEngine ? 'expand_less' : 'tune' }}</mat-icon>
+        {{ showAuditEngine ? 'Hide Audit Scanner' : 'Configure / Run New Scan' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ⚙️ SCANNER CONTROL PANEL (SHOW AUDIT ENGINE PARAMETERS) -->
+  <mat-card class="scanner-card" *ngIf="showAuditEngine">
+    <div class="scanner-header-row">
+      <div class="header-left-title">
+        <div class="panel-icon-box">
+          <mat-icon>tune</mat-icon>
+        </div>
+        <div>
+          <h2 class="panel-title">Audit Engine Parameters</h2>
+          <p class="panel-subtitle">Configure target URL, WCAG standard level, and legal compliance frameworks</p>
+        </div>
+      </div>
+      <span class="panel-badge"><mat-icon class="badge-icon">bolt</mat-icon> Automated Scan Engine</span>
+    </div>
+
+    <mat-card-content class="mt-3">
+      <!-- 🚨 SCAN ERROR BANNER -->
+      <div class="scan-error-banner" *ngIf="scanErrorMessage">
+        <mat-icon color="warn" class="error-icon">error_outline</mat-icon>
+        <div class="error-text">
+          <strong>Accessibility Scan Failed</strong>
+          <p>{{ scanErrorMessage }}</p>
+        </div>
+        <button mat-icon-button (click)="scanErrorMessage = null" aria-label="Close error banner">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="runAudit()" class="scanner-form">
+        
+        <div class="form-inputs-row">
+          <mat-form-field appearance="outline" class="url-input-field">
+            <mat-label>Target Web Application URL</mat-label>
+            <input matInput formControlName="url" placeholder="https://example.com" />
+            <mat-icon matSuffix color="primary">language</mat-icon>
+            <mat-error *ngIf="form.controls.url.hasError('required')">Target URL is required</mat-error>
+            <mat-error *ngIf="form.controls.url.hasError('pattern')">Must start with http:// or https://</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="standard-select">
+            <mat-label>WCAG Version Level</mat-label>
+            <mat-select formControlName="standard">
+              <mat-option value="wcag21aa">WCAG 2.1 AA (Recommended)</mat-option>
+              <mat-option value="wcag22aa">WCAG 2.2 AA (Latest Standard)</mat-option>
+              <mat-option value="wcag2aa">WCAG 2.0 AA</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="standard-select">
+            <mat-label>Browser Execution Mode</mat-label>
+            <mat-select formControlName="browserMode">
+              <mat-option value="headless">Headless (Default)</mat-option>
+              <mat-option value="interactive">Interactive Browser</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="btn-container">
+            <button mat-raised-button color="accent" type="submit" [disabled]="form.invalid || isScanning" class="scan-btn">
+              <mat-icon>play_circle</mat-icon> Run Compliance Audit
+            </button>
+          </div>
+        </div>
+
+        <!-- COMPLIANCE LAWS CHECKBOXES -->
+        <div class="standards-checkboxes-container w-100" formGroupName="standards">
+          <div class="checkbox-header-row">
+            <mat-icon class="sec-mini-icon">gavel</mat-icon>
+            <span class="checkbox-label">Select Legal Frameworks & Standards to Audit:</span>
+          </div>
+          <div class="checkboxes-grid">
+            <div class="checkbox-pill-item">
+              <mat-checkbox formControlName="wcag" color="primary" [checked]="true">
+                <span class="cb-title">WCAG 2.1 / 2.2 AA</span>
+                <span class="cb-desc">Web Accessibility Guidelines</span>
+              </mat-checkbox>
+            </div>
+            <div class="checkbox-pill-item">
+              <mat-checkbox formControlName="ada" color="primary">
+                <span class="cb-title">ADA Title III</span>
+                <span class="cb-desc">US Civil Rights Act</span>
+              </mat-checkbox>
+            </div>
+            <div class="checkbox-pill-item">
+              <mat-checkbox formControlName="eaa" color="primary">
+                <span class="cb-title">EAA (EN 301 549)</span>
+                <span class="cb-desc">European Accessibility Act</span>
+              </mat-checkbox>
+            </div>
+            <div class="checkbox-pill-item">
+              <mat-checkbox formControlName="section508" color="primary">
+                <span class="cb-title">Section 508</span>
+                <span class="cb-desc">US Federal Rehabilitation</span>
+              </mat-checkbox>
+            </div>
+            <div class="checkbox-pill-item">
+              <mat-checkbox formControlName="aoda" color="primary">
+                <span class="cb-title">AODA</span>
+                <span class="cb-desc">Ontario Accessibility Act</span>
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ⏳ SKELETON LOADER (DISPLAYED DURING ACTIVE SCANNING) -->
+  <div class="skeleton-loader-container" *ngIf="isScanning">
+    <mat-card class="status-ticker-card">
+      <mat-card-content>
+        <div class="ticker-content">
+          <div class="spinner-pulse"></div>
+          <div class="ticker-text">
+            <div class="ticker-step">Step {{ scanProgressStep }} of 5</div>
+            <div class="ticker-message">{{ scanProgressMessage }}</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- 📊 EYE-CATCHY ACCESSIBILITY AUDIT DASHBOARD -->
+  <div class="dashboard-results-container" *ngIf="activeReport && !isScanning">
+
+    <!-- 🏆 OVERALL COMPLIANCE SCORE HEADER CARD -->
+    <mat-card class="score-card" [ngClass]="getScoreColorClass(activeReport.score)">
+      <mat-card-content>
+
+        <!-- CARD TOP BAR & SECTION HEADING -->
+        <div class="score-card-header-bar">
+          <div class="header-left">
+            <div class="header-tag">Audit Performance Overview</div>
+            <h2 class="card-main-heading">Compliance Score & Application Audit Target</h2>
+          </div>
+
+          <div class="download-action">
+            <button mat-raised-button color="accent" (click)="downloadExecutiveReport()" class="download-btn">
+              <mat-icon>file_download</mat-icon> Download Executive Report
+            </button>
+          </div>
+        </div>
+
+        <!-- MAIN SCORE GRID: GAUGE CIRCLE + METADATA -->
+        <div class="score-dashboard-grid">
+
+          <!-- SCORE GAUGE CIRCLE -->
+          <div class="gauge-wrapper">
+            <div class="gauge-container">
+              <svg class="score-svg-circle" viewBox="0 0 140 140">
+                <defs>
+                  <linearGradient id="scoreGradPass" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#10b981" />
+                    <stop offset="100%" stop-color="#059669" />
+                  </linearGradient>
+                  <linearGradient id="scoreGradMod" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#f59e0b" />
+                    <stop offset="100%" stop-color="#d97706" />
+                  </linearGradient>
+                  <linearGradient id="scoreGradFail" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#f43f5e" />
+                    <stop offset="100%" stop-color="#e11d48" />
+                  </linearGradient>
+                </defs>
+                <circle class="bg-circle" cx="70" cy="70" r="56"></circle>
+                <circle class="progress-circle" cx="70" cy="70" r="56"
+                  [style.strokeDashoffset]="getScoreDashOffset(activeReport.score)"></circle>
+              </svg>
+              <div class="gauge-text">
+                <div class="score-value">{{ activeReport.score }}<span class="max-score">/100</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TARGET METADATA -->
+          <div class="target-meta">
+            <h3 class="target-name">{{ activeReport.targetTitle || 'Audited Application' }}</h3>
+
+            <div class="url-badge">
+              <mat-icon class="url-icon">public</mat-icon>
+              <span class="url-text">{{ activeReport.url }}</span>
+            </div>
+
+            <div class="meta-pills-row">
+              <span class="meta-chip"><mat-icon>verified_user</mat-icon> Standard: {{ activeReport.standard | uppercase
+                }}</span>
+              <span class="meta-chip"><mat-icon>schedule</mat-icon> Audited: {{ activeReport.scanTime | date:'medium'
+                }}</span>
+            </div>
+
+            <div class="status-pills mt-3">
+              <span class="pill pass">
+                <mat-icon class="pill-icon">check_circle</mat-icon>
+                {{ activeReport.summary.passedAuditsCount }} Passed Audits
+              </span>
+              <span class="pill fail">
+                <mat-icon class="pill-icon">error</mat-icon>
+                {{ activeReport.summary.totalViolationsCount }} Violations Found
+              </span>
+              <span class="pill manual">
+                <mat-icon class="pill-icon">help_outline</mat-icon>
+                {{ activeReport.summary.manualAuditsCount }} Required Manual Audits
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+
+    <!-- 📑 EXECUTIVE SUMMARY CARD (IN START) -->
+    <mat-card class="executive-summary-card" *ngIf="getExecutiveSummary() as exec">
+      <mat-card-content>
+        <div class="exec-header">
+          <span class="exec-badge">EXEC</span>
+          <h2 class="exec-title">Executive Summary</h2>
+        </div>
+
+        <p class="exec-description">
+          {{ exec.description }}
+        </p>
+
+        <div class="exec-boxes mt-3">
+          <div class="exec-box strength-box" *ngIf="exec.strengths && exec.strengths.length > 0">
+            <span class="box-icon green-icon">✓</span>
+            <span class="box-label green-label">Strengths:</span>
+            <span class="box-content">{{ exec.strengths.join(' · ') }}</span>
+          </div>
+
+          <div class="exec-box priority-box mt-2" *ngIf="exec.priorityAreas && exec.priorityAreas.length > 0">
+            <span class="box-icon amber-icon">⚠</span>
+            <span class="box-label amber-label">Priority Areas:</span>
+            <span class="box-content">{{ exec.priorityAreas.join(' · ') }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- ⚖️ MULTI-STANDARD LEGAL COMPLIANCE BREAKDOWN GRID -->
+    <div class="section-block mt-2"
+      *ngIf="activeReport.complianceChecklist && activeReport.complianceChecklist.length > 0">
+      <div class="section-header">
+        <mat-icon class="sec-icon">gavel</mat-icon>
+        <h3>Legal Compliance Frameworks Breakdown</h3>
+      </div>
+      <div class="standards-compliance-grid">
+        <div class="std-card" *ngFor="let item of activeReport.complianceChecklist"
+          [ngClass]="item.compliant ? 'compliant' : 'non-compliant'">
+          <div class="std-header">
+            <div class="std-icon-box">
+              <mat-icon class="std-icon">{{ item.compliant ? 'verified' : 'gpp_bad' }}</mat-icon>
+            </div>
+            <div class="std-status-pill">{{ item.compliant ? 'COMPLIANT' : 'NON-COMPLIANT' }}</div>
+          </div>
+          <div class="std-body">
+            <div class="std-title">{{ item.title }}</div>
+            <div class="std-subtitle">{{ item.subtitle }}</div>
+          </div>
+          <div class="std-footer">
+            <span class="std-count-text">
+              {{ item.compliant ? 'Zero Violations Detected' : item.violationsCount + ' Violations Found' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📈 METRICS SUMMARY CARDS -->
+    <div class="section-block mt-2">
+      <div class="section-header">
+        <mat-icon class="sec-icon">insights</mat-icon>
+        <h3>Audit Severity Breakdown</h3>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-card critical" (click)="setSeverityFilter('critical')"
+          [class.selected]="filterSeverity === 'critical'">
+          <div class="card-top">
+            <span class="dot critical-dot"></span>
+            <span class="count">{{ activeReport.summary.criticalCount }}</span>
+          </div>
+          <div class="label">Critical Issues</div>
+          <div class="subtext">Blocks screen readers & keyboard navigation</div>
+        </div>
+
+        <div class="metric-card serious" (click)="setSeverityFilter('serious')"
+          [class.selected]="filterSeverity === 'serious'">
+          <div class="card-top">
+            <span class="dot serious-dot"></span>
+            <span class="count">{{ activeReport.summary.seriousCount }}</span>
+          </div>
+          <div class="label">Serious Issues</div>
+          <div class="subtext">Severe contrast or interaction barriers</div>
+        </div>
+
+        <div class="metric-card passed">
+          <div class="card-top">
+            <span class="dot passed-dot"></span>
+            <span class="count">{{ activeReport.summary.passedAuditsCount }}</span>
+          </div>
+          <div class="label">Passed Audits</div>
+          <div class="subtext">WCAG criteria verified & fully compliant</div>
+        </div>
+
+        <div class="metric-card manual">
+          <div class="card-top">
+            <span class="dot manual-dot"></span>
+            <span class="count">{{ activeReport.summary.manualAuditsCount }}</span>
+          </div>
+          <div class="label">Required Manual Audits</div>
+          <div class="subtext">Requires human QA manual testing</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📑 GRANULAR AUDIT FINDINGS TABS -->
+    <mat-card class="findings-card mt-2">
+      <mat-card-content>
+        <mat-tab-group class="custom-tab-group">
+
+          <!-- TAB 1: VIOLATIONS & REMEDIATION SUGGESTIONS -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">error_outline</mat-icon>
+              <span>Violations & Fixes ({{ activeReport.summary.totalViolationsCount }})</span>
+            </ng-template>
+
+            <div class="tab-inner">
+              <div class="filter-chips-row mb-4">
+                <span class="filter-label">Filter by Severity:</span>
+                <mat-chip-set class="custom-chip-set">
+                  <mat-chip-option [selected]="filterSeverity === 'all'" (click)="setSeverityFilter('all')">
+                    All Violations ({{ activeReport.summary.totalViolationsCount }})
+                  </mat-chip-option>
+                  <mat-chip-option [selected]="filterSeverity === 'critical'" (click)="setSeverityFilter('critical')">
+                    Critical ({{ activeReport.summary.criticalCount }})
+                  </mat-chip-option>
+                  <mat-chip-option [selected]="filterSeverity === 'serious'" (click)="setSeverityFilter('serious')">
+                    Serious ({{ activeReport.summary.seriousCount }})
+                  </mat-chip-option>
+                  <mat-chip-option [selected]="filterSeverity === 'moderate'" (click)="setSeverityFilter('moderate')">
+                    Moderate ({{ activeReport.summary.moderateCount }})
+                  </mat-chip-option>
+                  <mat-chip-option [selected]="filterSeverity === 'minor'" (click)="setSeverityFilter('minor')">
+                    Minor ({{ activeReport.summary.minorCount }})
+                  </mat-chip-option>
+                </mat-chip-set>
+              </div>
+
+              <div class="violations-accordion" *ngIf="getFilteredViolations().length > 0; else noViolations">
+                <mat-accordion multi class="custom-accordion">
+                  <mat-expansion-panel *ngFor="let violation of getFilteredViolations()" class="violation-panel">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title class="v-title">
+                        <span class="impact-badge" [ngClass]="violation.impact">{{ violation.impact }}</span>
+                        <span class="v-rule-id"><code>{{ violation.id }}</code></span>
+                        <span class="v-help-text">{{ violation.help }}</span>
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="v-details mt-3">
+                      <p class="desc-text"><b>Description:</b> {{ violation.description }}</p>
+
+                      <!-- VIOLATED LAWS & STANDARDS BADGES -->
+                      <div class="violated-laws-row mb-3"
+                        *ngIf="violation.matchedStandards && violation.matchedStandards.length > 0">
+                        <span class="law-label">Violates Frameworks:</span>
+                        <span class="law-tag" *ngFor="let law of violation.matchedStandards">{{ law }}</span>
+                      </div>
+
+                      <p *ngIf="violation.helpUrl" class="deque-link">
+                        <a [href]="violation.helpUrl" target="_blank" rel="noopener" class="guidance-anchor">
+                          <mat-icon class="external-icon">open_in_new</mat-icon>
+                          View Official Guideline Guidance & Fix Examples
+                        </a>
+                      </p>
+
+                      <!-- AFFECTED NODES LIST -->
+                      <div class="nodes-list mt-3">
+                        <div class="node-card" *ngFor="let node of violation.nodes">
+                          <div class="node-target">
+                            <span class="node-label">Target CSS Selector:</span>
+                            <code class="selector-code">{{ node.target.join(' > ') }}</code>
+                          </div>
+                          <div class="node-html mt-2" *ngIf="node.html">
+                            <span class="node-label">DOM Element Snippet:</span>
+                            <pre class="html-snippet"><code>{{ node.html }}</code></pre>
+                          </div>
+                          <div class="node-fix mt-2" *ngIf="node.failureSummary">
+                            <div class="fix-header">
+                              <mat-icon class="fix-icon">build</mat-icon>
+                              <b>Remediation Fix Recommendation:</b>
+                            </div>
+                            <pre class="fix-code">{{ node.failureSummary }}</pre>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-expansion-panel>
+                </mat-accordion>
+              </div>
+
+              <ng-template #noViolations>
+                <div class="empty-state-box">
+                  <mat-icon class="state-icon">verified</mat-icon>
+                  <p>No violations found matching filter <b>{{ filterSeverity }}</b>.</p>
+                </div>
+              </ng-template>
+            </div>
+          </mat-tab>
+
+          <!-- TAB 2: REQUIRED MANUAL AUDITS -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">pan_tool</mat-icon>
+              <span>Required Manual Audits ({{ activeReport.summary.manualAuditsCount }})</span>
+            </ng-template>
+
+            <div class="tab-inner">
+              <p class="section-desc">
+                The following accessibility rules require manual QA inspection (e.g., verifying background image
+                contrast, audio descriptions, or logical keyboard tab order).
+              </p>
+
+              <div class="manual-list" *ngIf="activeReport.manualAudits.length > 0; else noManual">
+                <mat-accordion multi class="custom-accordion">
+                  <mat-expansion-panel *ngFor="let item of activeReport.manualAudits" class="violation-panel">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title class="v-title">
+                        <span class="manual-badge">MANUAL REVIEW</span>
+                        <span class="v-rule-id"><code>{{ item.id }}</code></span>
+                        <span class="v-help-text">{{ item.help }}</span>
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="manual-body mt-3">
+                      <p class="desc-text"><b>Description:</b> {{ item.description }}</p>
+                      <p *ngIf="item.helpUrl">
+                        <a [href]="item.helpUrl" target="_blank" rel="noopener" class="guidance-anchor">
+                          <mat-icon class="external-icon">open_in_new</mat-icon>
+                          Manual Testing Checklist Reference
+                        </a>
+                      </p>
+
+                      <div class="nodes-list mt-3" *ngFor="let node of item.nodes">
+                        <div class="node-target">
+                          <span class="node-label">Target Selector:</span>
+                          <code class="selector-code">{{ node.target.join(' > ') }}</code>
+                        </div>
+                        <div class="node-html mt-2" *ngIf="node.html">
+                          <pre class="html-snippet"><code>{{ node.html }}</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-expansion-panel>
+                </mat-accordion>
+              </div>
+
+              <ng-template #noManual>
+                <div class="empty-state-box">
+                  <mat-icon class="state-icon">check_circle</mat-icon>
+                  <p>No manual audits required for this page scan.</p>
+                </div>
+              </ng-template>
+            </div>
+          </mat-tab>
+
+          <!-- TAB 3: PASSED AUDITS -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">task_alt</mat-icon>
+              <span>Passed Criteria ({{ activeReport.summary.passedAuditsCount }})</span>
+            </ng-template>
+
+            <div class="tab-inner">
+              <p class="section-desc">
+                The following WCAG criteria were verified and passed successfully on the target application URL.
+              </p>
+
+              <div class="passed-grid">
+                <div class="passed-item" *ngFor="let pass of activeReport.passedAudits">
+                  <div class="pass-icon-box">
+                    <mat-icon class="pass-icon">check_circle</mat-icon>
+                  </div>
+                  <div class="pass-info">
+                    <div class="pass-title">
+                      <code>{{ pass.id }}</code> - {{ pass.help }}
+                    </div>
+                    <div class="pass-desc">{{ pass.description }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- TAB 4: SAVED AUDIT REPORTS HISTORY -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">history</mat-icon>
+              <span>Saved Reports History ({{ savedReports.length }})</span>
+            </ng-template>
+
+            <div class="tab-inner">
+              <div class="saved-reports-list" *ngIf="savedReports.length > 0; else noSaved">
+                <div class="report-row" *ngFor="let rep of savedReports">
+                  <div class="rep-score-badge" [ngClass]="getScoreColorClass(rep.score)">
+                    {{ rep.score }}/100
+                  </div>
+
+                  <div class="rep-info">
+                    <div class="rep-title"><b>{{ rep.targetTitle || rep.url }}</b></div>
+                    <div class="rep-url"><code>{{ rep.url }}</code></div>
+                    <div class="rep-time">{{ rep.scanTime | date:'medium' }}</div>
+                  </div>
+
+                  <div class="rep-counts">
+                    <span class="pill fail">✖ {{ rep.summary.totalViolationsCount }} Violations</span>
+                    <span class="pill pass">✔ {{ rep.summary.passedAuditsCount }} Passed</span>
+                  </div>
+
+                  <button mat-raised-button color="primary" (click)="viewSavedReport(rep.scanId)"
+                    class="view-report-btn">
+                    <mat-icon>visibility</mat-icon> View Audit Report
+                  </button>
+                </div>
+              </div>
+
+              <ng-template #noSaved>
+                <div class="empty-state-box">
+                  <mat-icon class="state-icon">history</mat-icon>
+                  <p>No saved WCAG audit reports available in storage history.</p>
+                </div>
+              </ng-template>
+            </div>
+          </mat-tab>
+
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- 📋 WCAG SUCCESS CRITERIA CHECKLIST TABLE (100% DYNAMIC & FILTERED) -->
+    <mat-card class="wcag-checklist-card mt-4" *ngIf="getWcagChecklist().length > 0">
+      <mat-card-header>
+        <div class="checklist-header-title">
+          <div class="checklist-badge">{{ getStandardBadge() }}</div>
+          <div>
+            <mat-card-title>{{ getStandardTitle() }} Success Criteria Checklist</mat-card-title>
+            <mat-card-subtitle>Verified audit criteria across Perceivable, Operable, Understandable & Robust principles
+              for {{ activeReport.targetTitle || activeReport.url }}</mat-card-subtitle>
+          </div>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="table-wrapper mt-3">
+          <table mat-table [dataSource]="getWcagChecklist()" class="checklist-table">
+
+            <!-- Principle -->
+            <ng-container matColumnDef="principle">
+              <th mat-header-cell *matHeaderCellDef>Principle</th>
+              <td mat-cell *matCellDef="let row">
+                <span class="principle-pill" [ngClass]="row.principle.toLowerCase()">
+                  {{ row.principle }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Success Criteria -->
+            <ng-container matColumnDef="codeAndName">
+              <th mat-header-cell *matHeaderCellDef>Success Criteria</th>
+              <td mat-cell *matCellDef="let row">
+                <div class="criteria-cell">
+                  <code class="criteria-code">{{ row.code }}</code>
+                  <span class="criteria-name">{{ row.name }}</span>
+                  <span class="criteria-level">({{ row.level }})</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Status -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let row">
+                <span class="status-cell-pill" [ngClass]="row.status.toLowerCase()">
+                  <span class="status-icon">{{ row.status === 'Pass' ? '✓' : '⚠' }}</span>
+                  {{ row.status }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Priority -->
+            <ng-container matColumnDef="priority">
+              <th mat-header-cell *matHeaderCellDef>Priority</th>
+              <td mat-cell *matCellDef="let row">
+                <span class="priority-pill" [ngClass]="row.priority.toLowerCase()">
+                  {{ row.priority }}
+                </span>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedChecklistColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedChecklistColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- ℹ️ CLEAN LANDING PLACEHOLDER (IF NO ACTIVE REPORT LOADED) -->
+  <div class="no-report-placeholder" *ngIf="!activeReport && !isScanning && !showAuditEngine">
+    <mat-card class="placeholder-card">
+      <mat-card-content>
+        <mat-icon class="ph-icon">accessibility_new</mat-icon>
+        <h2>WCAG & Multi-Standard Compliance Audit Center</h2>
+        <p>Run automated accessibility scans across WCAG 2.1/2.2 AA, ADA Title III, EAA, Section 508, and AODA legal
+          compliance frameworks.</p>
+
+        <button mat-raised-button color="accent" (click)="showAuditEngine = true" class="ph-btn mt-2">
+          <mat-icon>play_circle</mat-icon> Configure & Run Audit
+        </button>
+
+        <!-- SAVED AUDITS QUICK SELECTION -->
+        <div class="saved-reports-quick-access mt-4" *ngIf="savedReports.length > 0">
+          <h3 class="quick-title">Or Select a Saved Audit Report from Storage:</h3>
+          <div class="quick-reports-grid">
+            <div class="quick-rep-card" *ngFor="let rep of savedReports" (click)="viewSavedReport(rep.scanId)">
+              <div class="rep-score" [ngClass]="getScoreColorClass(rep.score)">{{ rep.score }}/100</div>
+              <div class="rep-details">
+                <div class="rep-title"><b>{{ rep.targetTitle || rep.url }}</b></div>
+                <div class="rep-meta"><code>{{ rep.url }}</code></div>
+                <div class="rep-sub">{{ rep.scanTime | date:'short' }} • {{ rep.summary.totalViolationsCount }}
+                  Violations</div>
+              </div>
+              <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</section>

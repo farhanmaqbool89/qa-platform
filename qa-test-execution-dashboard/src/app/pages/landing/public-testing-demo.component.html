@@ -1,0 +1,65 @@
+<div class="public-demo-layout">
+  
+  <header class="demo-header">
+    <div class="header-container">
+      <a routerLink="/" class="brand">
+        <mat-icon class="brand-icon">auto_awesome</mat-icon>
+        <span>Qevixa</span>
+      </a>
+      <span class="demo-badge">Public AI Test Generator Playground</span>
+      <div class="header-actions">
+        <a routerLink="/login" class="login-btn">Login to Dashboard →</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="demo-content">
+    <div class="demo-card">
+      <div class="card-intro">
+        <h1>AI Test Generation Playground</h1>
+        <p>Enter any software feature requirement or user story below to automatically synthesize BDD Gherkin test scenarios.</p>
+        <span class="rate-hint">⚡ Public Interactive Demo (Max 1,000 chars requirement input).</span>
+      </div>
+
+      <div class="input-section">
+        <label class="input-label">User Story or Requirement Specification</label>
+        <textarea [(ngModel)]="requirementText" rows="4" placeholder="Enter requirement or acceptance criteria..." class="req-textarea" [disabled]="isGenerating"></textarea>
+        
+        <div class="action-bar">
+          <span class="char-count">{{ requirementText.length || 0 }} / 1000 chars</span>
+          <button class="gen-btn" (click)="generatePublicScenarios()" [disabled]="isGenerating || !requirementText">
+            <mat-icon *ngIf="!isGenerating">auto_awesome</mat-icon>
+            <mat-spinner *ngIf="isGenerating" diameter="18"></mat-spinner>
+            <span>{{ isGenerating ? 'Synthesizing Scenarios...' : 'Generate Scenarios with AI' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ERROR BANNER -->
+      <div class="error-banner" *ngIf="errorMessage">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <!-- AI GENERATED RESULTS PREVIEW -->
+      <div class="results-container" *ngIf="aiResult">
+        <div class="results-header">
+          <div>
+            <h2>Synthesized Gherkin Scenarios</h2>
+            <span class="limit-tag">{{ aiResult.demoLimits }}</span>
+          </div>
+        </div>
+
+        <div class="code-box">
+          <pre><code>{{ aiResult.gherkinContent }}</code></pre>
+        </div>
+
+        <div class="demo-cta-footer">
+          <p>Want 1-click Playwright test execution, locator self-healing, and Jira/GitHub sync?</p>
+          <a routerLink="/login" class="full-access-btn">Login to Full Qevixa Platform →</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+</div>

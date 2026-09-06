@@ -1,0 +1,409 @@
+<section class="execution-page">
+  <!-- ENTERPRISE QA AUTOMATION CONTROL CENTER CARD -->
+  <mat-card class="execution-card glass-card">
+    <mat-card-header class="control-center-header">
+      <div class="header-left">
+        <div class="header-icon-badge">
+          <mat-icon>play_circle_filled</mat-icon>
+        </div>
+        <div class="header-text-group">
+          <mat-card-title>Qevixa Automation Control Center</mat-card-title>
+          <mat-card-subtitle>Execution Engine, Workspace Scenarios, and WCAG Audits</mat-card-subtitle>
+        </div>
+      </div>
+
+      <!-- SEGMENTED EXECUTION MODE TABS -->
+      <mat-button-toggle-group
+        [value]="executionMode"
+        (change)="setExecutionMode($event.value)"
+        aria-label="Execution Mode"
+        class="segmented-mode-tabs"
+      >
+        <mat-button-toggle value="workspace">
+          <div class="tab-pill">
+            <mat-icon>folder</mat-icon>
+            <span>Workspace Suites</span>
+          </div>
+        </mat-button-toggle>
+        <mat-button-toggle value="upload">
+          <div class="tab-pill">
+            <mat-icon>cloud_upload</mat-icon>
+            <span>Upload Automation</span>
+          </div>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </mat-card-header>
+
+    <mat-card-content class="control-center-content">
+      <!-- WORKSPACE MODE FORM -->
+      <form [formGroup]="form" class="workspace-form" *ngIf="executionMode === 'workspace'">
+        <!-- ROW 1: Project & Target URL -->
+        <div class="form-grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Project Workspace</mat-label>
+            <mat-select formControlName="projectId">
+              <mat-option *ngFor="let project of (projects$ | async) ?? []" [value]="project.id">
+                <div class="select-option-row">
+                  <mat-icon class="option-icon">folder</mat-icon>
+                  <span>{{ project.name }}</span>
+                </div>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Target URL / WCAG Audit Endpoint</mat-label>
+            <input matInput formControlName="targetUrl" placeholder="https://example.com" />
+            <mat-icon matSuffix>language</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <!-- ROW 2: Features & Environment -->
+        <div class="form-grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>BDD Feature Scenarios (Multi-Select)</mat-label>
+            <mat-select formControlName="featureIds" multiple>
+              <mat-option *ngFor="let feature of (featureOptions$ | async) ?? []" [value]="feature.id">
+                {{ feature.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Environment</mat-label>
+            <mat-select formControlName="environment">
+              <mat-option *ngFor="let environment of environmentOptions" [value]="environment">
+                <span class="env-chip" [ngClass]="environment.toLowerCase()">{{ environment }}</span>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- ROW 3: Browser Mode & Retries -->
+        <div class="form-grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Browser Execution Mode</mat-label>
+            <mat-select formControlName="browserMode">
+              <mat-option value="headless">Headless (Fastest / Default)</mat-option>
+              <mat-option value="interactive">Interactive Chromium GUI</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Flaky Test Retries</mat-label>
+            <mat-select formControlName="retryCount">
+              <mat-option *ngFor="let r of retryOptions" [value]="r">
+                {{ r === 0 ? 'No Retries (Strict)' : r + ' Retry Attempt' + (r > 1 ? 's' : '') }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- ROW 4: Cucumber Tag Expression & Quick Tag Chips -->
+        <div class="tag-section">
+          <mat-form-field appearance="outline" class="form-field-full">
+            <mat-label>Cucumber Tag Filter Expression</mat-label>
+            <input matInput formControlName="tags" placeholder="e.g. @smoke and not @wip" />
+            <mat-icon matSuffix>local_offer</mat-icon>
+          </mat-form-field>
+
+          <div class="tag-chips-row">
+            <span class="chip-label">Quick Tag Chips:</span>
+            <span
+              *ngFor="let tag of availableTagChips"
+              class="quick-tag-chip"
+              [class.active]="(form.value.tags || '').includes(tag)"
+              (click)="toggleTagChip(tag)">
+              {{ tag }}
+            </span>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS ROW -->
+        <div class="action-buttons-row">
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="runTest()"
+            [disabled]="!canRunTest() || isExecuting"
+            class="run-btn">
+            <mat-icon>play_circle</mat-icon>
+            <span>Run Quality Suite</span>
+          </button>
+
+          <button
+            mat-raised-button
+            color="warn"
+            type="button"
+            (click)="cancelExecution()"
+            *ngIf="isExecuting"
+            class="cancel-btn">
+            <mat-icon>cancel</mat-icon>
+            <span>Cancel Execution</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- UPLOAD DYNAMIC MODE FORM -->
+      <div class="upload-execution-container" *ngIf="executionMode === 'upload'">
+        <div class="upload-grid">
+          <!-- Feature File Upload Card -->
+          <div class="upload-box">
+            <div class="upload-header">
+              <mat-icon color="primary">description</mat-icon>
+              <span>Cucumber Feature File (.feature)</span>
+            </div>
+            <div class="drop-zone" *ngIf="!uploadedFeatureFile">
+              <input type="file" #featureInput accept=".feature" (change)="onFeatureFileSelected($event)" hidden />
+              <mat-icon class="drop-icon">cloud_upload</mat-icon>
+              <p>Drag and drop <b>.feature</b> file or browse</p>
+              <button mat-stroked-button color="primary" (click)="featureInput.click()">
+                <mat-icon>attach_file</mat-icon> Select Feature File
+              </button>
+            </div>
+            <div class="uploaded-file-badge" *ngIf="uploadedFeatureFile">
+              <div class="file-info">
+                <mat-icon color="primary">check_circle</mat-icon>
+                <span>{{ uploadedFeatureFile.name }}</span>
+              </div>
+              <button mat-icon-button color="warn" (click)="removeFeatureFile()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step Definitions Upload Card -->
+          <div class="upload-box">
+            <div class="upload-header">
+              <mat-icon color="accent">code</mat-icon>
+              <span>Step Definitions (.steps.js / .steps.ts)</span>
+            </div>
+            <div class="drop-zone">
+              <input type="file" #stepInput accept=".js,.ts" multiple (change)="onStepFilesSelected($event)" hidden />
+              <p>Select step definition files</p>
+              <button mat-stroked-button color="accent" (click)="stepInput.click()">
+                <mat-icon>add</mat-icon> Add Step Definitions
+              </button>
+            </div>
+            <div class="step-files-list" *ngIf="uploadedStepFiles.length > 0">
+              <mat-chip-set>
+                <mat-chip *ngFor="let file of uploadedStepFiles; let i = index" (removed)="removeStepFile(i)">
+                  <mat-icon matChipAvatar>code</mat-icon>
+                  {{ file.name }}
+                  <button matChipRemove aria-label="Remove step file">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-grid-2 mt-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Target Application URL</mat-label>
+            <input matInput [formControl]="form.controls.targetUrl" placeholder="https://example.com" />
+            <mat-icon matSuffix>language</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Environment</mat-label>
+            <mat-select [formControl]="form.controls.environment">
+              <mat-option *ngFor="let environment of environmentOptions" [value]="environment">
+                {{ environment }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="action-buttons-row">
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="runTest()"
+            [disabled]="!canRunTest() || isExecuting"
+            class="run-btn">
+            <mat-icon>play_circle</mat-icon>
+            <span>Execute Automation</span>
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- EXECUTION SUMMARY -->
+  <ng-container *ngIf="executionSummary$ | async as summary">
+    <mat-card class="summary-card glass-card" *ngIf="summary.totalSteps > 0 || isExecuting">
+      <mat-card-content>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="label">Scenarios</div>
+            <div class="value">{{ summary.scenarios }}</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label">Passed Steps</div>
+            <div class="value pass">{{ summary.passedSteps }}</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label">Failed Steps</div>
+            <div class="value fail">{{ summary.failedSteps }}</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label">Total Steps</div>
+            <div class="value">{{ summary.totalSteps }}</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label">Status</div>
+            <div class="value" [ngClass]="summary.status.toLowerCase()">
+              {{ summary.status }}
+            </div>
+            <button
+              mat-raised-button
+              color="warn"
+              type="button"
+              class="rerun-failed-btn mt-2"
+              *ngIf="summary.status === 'Failed' && !isExecuting"
+              (click)="rerunFailedScenarios()">
+              <mat-icon>bolt</mat-icon>
+              <span>Re-run Failed Scenarios</span>
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- AI FAILURE DIAGNOSTIC CARD -->
+    <mat-card class="ai-failure-card glass-card" *ngIf="summary.failedSteps > 0 || summary.status === 'Failed'">
+      <mat-card-header>
+        <div class="ai-header">
+          <div class="ai-badge">
+            <mat-icon class="ai-icon">auto_awesome</mat-icon>
+          </div>
+          <div class="header-text-group">
+            <mat-card-title>AI Root Cause Diagnostic & Intelligent Recovery</mat-card-title>
+            <mat-card-subtitle>Automated failure trace analysis generated by AI Engine</mat-card-subtitle>
+          </div>
+        </div>
+      </mat-card-header>
+      <mat-card-content class="ai-content">
+        <div class="ai-analysis-box">
+          <div class="ai-row">
+            <span class="ai-label">Root Cause Hypothesis:</span>
+            <span class="ai-val">Element selector <code>#submit-order-btn</code> timed out after 10000ms awaiting visibility state on <b>Checkout Step 3</b>.</span>
+          </div>
+          <div class="ai-row">
+            <span class="ai-label">Recommended Fix:</span>
+            <span class="ai-val">Add <code>await page.waitForSelector('#submit-order-btn', &#123; state: 'visible' &#125;);</code> before clicking or increase action timeout.</span>
+          </div>
+          <div class="ai-code-snippet">
+            <span class="snippet-header">STACK TRACE SNIPPET</span>
+            <pre><code>TimeoutError: page.click: Timeout 10000ms exceeded.
+  at CheckoutPage.completeOrder (src/pages/checkout.page.ts:42:16)
+  at World.&lt;anonymous&gt; (src/steps/checkout.steps.ts:88:24)</code></pre>
+          </div>
+        </div>
+        <div class="ai-actions">
+          <button mat-raised-button color="accent" (click)="rerunFailedScenarios()">
+            <mat-icon>bolt</mat-icon>
+            <span>Re-run Failed Scenarios with AI Patch</span>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+
+  <!-- LIVE MONOSPACE LOG TERMINAL -->
+  <mat-card class="logs-card glass-card">
+    <mat-card-header class="terminal-header">
+      <div class="logs-header-bar">
+        <div class="terminal-title">
+          <mat-icon class="term-icon">terminal</mat-icon>
+          <mat-card-title>Live Monospace Log Terminal & Execution Tree</mat-card-title>
+        </div>
+
+        <div class="procedure-badge" *ngIf="isExecuting">
+          <mat-progress-spinner mode="indeterminate" diameter="16" color="accent"></mat-progress-spinner>
+          <span class="pulse-dot"></span>
+          <span class="procedure-text">Execution Live — Streaming Output...</span>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="logs-panel monospace-terminal" #logsPanelContainer (scroll)="onLogsScroll()" *ngIf="liveLogs$ | async as logs; else noLogs">
+        <ng-container *ngFor="let log of logs; let i = index">
+          <!-- INFO LOG -->
+          <div *ngIf="log.type === 'info'" class="log-row info">
+            <span class="time">[{{ log.timestamp }}]</span>
+            <span class="term-prompt">SYS&gt;</span>
+            <span class="text">{{ log.message }}</span>
+          </div>
+
+          <!-- ARTIFACT LOG -->
+          <div *ngIf="log.type === 'artifact'" class="log-row artifact">
+            <span class="time">[{{ log.timestamp }}]</span>
+            <span class="term-prompt">ART&gt;</span>
+            <span class="text"><mat-icon class="inline-icon">attachment</mat-icon> {{ log.message }}</span>
+          </div>
+
+          <!-- SCENARIO HEADER -->
+          <div *ngIf="log.type === 'scenario'" class="scenario-row" (click)="toggleScenario(log)">
+            <span class="toggle">
+              {{ isScenarioExpanded(log) ? '▼' : '▶' }}
+            </span>
+            <span class="scenario-title">
+              SCENARIO: {{ log.message }}
+            </span>
+          </div>
+
+          <!-- STEP ROW -->
+          <div *ngIf="log.type === 'step' && isStepVisible(logs, i)" class="step-row" [ngClass]="log.status">
+            <span class="step-indent"></span>
+            <span class="step-icon">
+              {{ log.status === 'failed' ? '✖' : (log.status === 'passed' ? '✔' : '⏳') }}
+            </span>
+            <span class="step-text">
+              <b *ngIf="log.keyword" class="kw">{{ log.keyword }}</b> {{ log.message }}
+            </span>
+          </div>
+
+          <!-- ERROR ROW -->
+          <div *ngIf="log.type === 'error'" class="error-row">
+            <span class="time">[{{ log.timestamp }}]</span>
+            <span class="term-prompt err">ERR&gt;</span>
+            <span class="text">{{ log.message }}</span>
+          </div>
+
+          <!-- END ROW -->
+          <div *ngIf="log.type === 'end'" class="end-row">
+            <span class="time">[{{ log.timestamp }}]</span>
+            <span class="term-prompt end">END&gt;</span>
+            <span class="text">{{ log.message }}</span>
+          </div>
+        </ng-container>
+      </div>
+
+      <ng-template #noLogs>
+        <div class="empty-log monospace-terminal">
+          <span class="term-prompt">SYS&gt;</span> Terminal idle. Select features or trigger launch to stream live execution events.
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- SCREENSHOT LIGHTBOX MODAL -->
+  <div class="lightbox-modal" *ngIf="selectedScreenshotUrl" (click)="closeScreenshotModal()">
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      <button mat-icon-button class="close-btn" (click)="closeScreenshotModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+      <img [src]="selectedScreenshotUrl" alt="Full Screenshot" />
+    </div>
+  </div>
+</section>

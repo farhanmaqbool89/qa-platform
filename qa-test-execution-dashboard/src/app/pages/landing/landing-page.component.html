@@ -1,0 +1,322 @@
+<div class="qevixa-landing">
+
+  <!-- 1. STICKY NAVIGATION HEADER -->
+  <header class="landing-header">
+    <div class="header-container">
+      <a class="brand" routerLink="/">
+        <div class="brand-icon-box">
+          <mat-icon class="brand-icon">auto_awesome</mat-icon>
+        </div>
+        <span class="brand-name">Qevixa</span>
+      </a>
+
+      <nav class="nav-links">
+        <a (click)="scrollToSection('capabilities')">Platform</a>
+        <a (click)="scrollToSection('ai-workflow')">AI Testing</a>
+        <a (click)="scrollToSection('accessibility')">Accessibility</a>
+        <a (click)="scrollToSection('analytics')">Analytics</a>
+        <a (click)="scrollToSection('enterprise')">Integrations</a>
+      </nav>
+
+      <div class="header-actions">
+        <a routerLink="/login" class="login-btn">Login</a>
+        <a routerLink="/accessibility-test" class="try-btn">Try WCAG Demo →</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. HERO SECTION WITH INTERACTIVE MOUSE CANVAS -->
+  <section class="hero-section">
+    <canvas #heroCanvas class="hero-canvas"></canvas>
+    
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span class="badge-text">Next-Generation AI Quality Engineering</span>
+      </div>
+
+      <h1 class="hero-title">
+        Ship Better Software With<br>
+        <span class="gradient-text">AI-Powered Quality Engineering</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Qevixa brings AI test generation, automated execution, intelligent failure diagnostics, WCAG accessibility testing, and release analytics into one unified Quality Engineering platform.
+      </p>
+
+      <div class="hero-ctas">
+        <a routerLink="/accessibility-test" class="primary-cta-btn">
+          <mat-icon>accessibility_new</mat-icon>
+          <span>Run WCAG Test</span>
+        </a>
+        <a routerLink="/login" class="secondary-cta-btn">
+          <mat-icon>login</mat-icon>
+          <span>Login to Dashboard</span>
+        </a>
+      </div>
+
+      <!-- Quick Trust Indicators -->
+      <div class="trust-metrics">
+        <div class="trust-item">
+          <mat-icon>bolt</mat-icon>
+          <span>10x Faster Test Synthesis</span>
+        </div>
+        <div class="trust-divider"></div>
+        <div class="trust-item">
+          <mat-icon>check_circle</mat-icon>
+          <span>WCAG 2.1 / 2.2 AA Compliance</span>
+        </div>
+        <div class="trust-divider"></div>
+        <div class="trust-item">
+          <mat-icon>build_circle</mat-icon>
+          <span>Self-Healing Locators</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. PRODUCT LIFECYCLE WORKFLOW SECTION -->
+  <section class="workflow-section" id="workflow">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">End-To-End Engineering</span>
+        <h2>End-To-End Quality Lifecycle Workflow</h2>
+        <p>From user story requirements to release confidence, Qevixa orchestrates every stage of modern software quality.</p>
+      </div>
+
+      <div class="workflow-grid">
+        <div class="workflow-card" *ngFor="let step of workflowSteps">
+          <div class="icon-circle">
+            <mat-icon>{{ step.icon }}</mat-icon>
+          </div>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. PRODUCT CAPABILITIES SECTION -->
+  <section class="capabilities-section" id="capabilities">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Core Platform</span>
+        <h2>Everything You Need to Engineer Quality</h2>
+        <p>Built for modern engineering teams demanding automated testing, fast feedback, and absolute release confidence.</p>
+      </div>
+
+      <div class="capabilities-grid">
+        <div class="capability-card" *ngFor="let cap of capabilities" [ngClass]="'hover-' + cap.color">
+          <div class="card-icon" [ngClass]="cap.color">
+            <mat-icon>{{ cap.icon }}</mat-icon>
+          </div>
+          <h3>{{ cap.title }}</h3>
+          <p>{{ cap.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. AI-POWERED TESTING SECTION -->
+  <section class="ai-section" id="ai-workflow">
+    <div class="section-container">
+      <div class="ai-box">
+        <div class="ai-text">
+          <span class="section-tag alt">AI Quality Assistant</span>
+          <h2>AI That Understands Your Quality Workflow</h2>
+          <p>Qevixa continuously analyzes requirements specs to generate BDD Gherkin scenarios, synthesize Playwright scripts, and diagnose execution stack traces with automated locator self-healing.</p>
+          
+          <ul class="ai-bullets">
+            <li><mat-icon>task_alt</mat-icon> <span>Requirements-to-Gherkin scenario generation</span></li>
+            <li><mat-icon>task_alt</mat-icon> <span>Automated cross-browser Playwright test synthesis</span></li>
+            <li><mat-icon>task_alt</mat-icon> <span>AI stack trace failure root-cause diagnostics</span></li>
+            <li><mat-icon>task_alt</mat-icon> <span>Dynamic DOM locator self-healing</span></li>
+          </ul>
+
+          <a routerLink="/login" class="ai-cta-btn">
+            <span>Access AI Automation Platform →</span>
+          </a>
+        </div>
+
+        <div class="ai-preview-card">
+          <div class="card-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="card-title">qevixa-ai-engine.spec.ts</span>
+          </div>
+          <div class="code-preview">
+            <pre><code><span class="kwd">Feature:</span> User Authentication & Security
+
+  <span class="tag">&#64;smoke &#64;ai_generated</span>
+  <span class="kwd">Scenario:</span> Validate successful MFA login flow
+    <span class="kwd">Given</span> user navigates to auth endpoint
+    <span class="kwd">When</span> user enters valid credentials & OTP
+    <span class="kwd">Then</span> system grants bearer JWT token
+    <span class="kwd">And</span> self-healing locator resolves `#submit-btn`</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. ACCESSIBILITY SECTION -->
+  <section class="accessibility-section" id="accessibility">
+    <div class="section-container">
+      <div class="access-banner">
+        <div class="access-content">
+          <span class="section-tag green">WCAG 2.1 / 2.2 AA</span>
+          <h2>Build Experiences Everyone Can Use</h2>
+          <p>Automate digital accessibility compliance across your entire web application portfolio. Audit against WCAG, ADA Title III, and Section 508 standards with actionable violation fixes.</p>
+
+          <div class="access-ctas">
+            <a routerLink="/accessibility-test" class="access-primary-btn">
+              <mat-icon>accessibility_new</mat-icon>
+              <span>Try WCAG Testing Free</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="access-badge-grid">
+          <div class="score-chip">
+            <span class="score-val">98%</span>
+            <span class="score-lbl">WCAG Pass Rate</span>
+          </div>
+          <div class="score-chip">
+            <span class="score-val">AA</span>
+            <span class="score-lbl">Compliance Level</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. ANALYTICS & RELEASE CONFIDENCE SECTION -->
+  <section class="analytics-section" id="analytics">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Quality Intelligence</span>
+        <h2>Analytics & Release Confidence Insights</h2>
+        <p>Continuous telemetry into test health, longitudinal pass trends, and release readiness.</p>
+        <span class="demo-notice">💡 Illustrative Project Metrics Preview</span>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-val">94</span>
+          <span class="metric-label">Quality Score</span>
+          <div class="progress-bar"><div class="fill" style="width: 94%;"></div></div>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-val">87%</span>
+          <span class="metric-label">Test Coverage</span>
+          <div class="progress-bar"><div class="fill" style="width: 87%;"></div></div>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-val">96</span>
+          <span class="metric-label">WCAG Score</span>
+          <div class="progress-bar"><div class="fill" style="width: 96%;"></div></div>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-val high">High</span>
+          <span class="metric-label">Release Confidence</span>
+          <div class="progress-bar"><div class="fill green" style="width: 98%;"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. SECURITY & ENTERPRISE SECTION -->
+  <section class="enterprise-section" id="enterprise">
+    <canvas #enterpriseCanvas class="enterprise-canvas"></canvas>
+    <div class="section-container">
+      <div class="enterprise-box">
+        <div class="sec-icon"><mat-icon>security</mat-icon></div>
+        <h2>Enterprise-Grade Security & Isolation</h2>
+        <p>Multi-tenant organization architecture, role-based access controls (RBAC), and secure browser execution environments engineered for enterprise quality teams.</p>
+        
+        <div class="sec-features">
+          <div class="sec-item"><mat-icon>verified_user</mat-icon> Role-Based Access (RBAC)</div>
+          <div class="sec-item"><mat-icon>domain</mat-icon> Multi-Tenant Workspace Isolation</div>
+          <div class="sec-item"><mat-icon>shield</mat-icon> Secure Execution Runners</div>
+          <div class="sec-item"><mat-icon>history</mat-icon> Audit Logs & Telemetry</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. WHO IS QEVIXA FOR -->
+  <section class="personas-section">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Target Personas</span>
+        <h2>Engineered for Modern Quality Teams</h2>
+      </div>
+
+      <div class="personas-grid">
+        <div class="persona-card" *ngFor="let p of personas">
+          <div class="p-icon"><mat-icon>{{ p.icon }}</mat-icon></div>
+          <h3>{{ p.title }}</h3>
+          <p>{{ p.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. FINAL CTA SECTION -->
+  <section class="final-cta-section">
+    <div class="cta-container">
+      <h2>Build Better Software. Release With Confidence.</h2>
+      <p>Unify test management, BDD automation, AI diagnostics, accessibility audits, and release insights with Qevixa.</p>
+      
+      <div class="cta-buttons">
+        <a routerLink="/login" class="cta-login-btn">Login to Dashboard</a>
+        <a routerLink="/accessibility-test" class="cta-demo-btn">Explore WCAG Testing</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. FOOTER -->
+  <footer class="landing-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="brand">
+          <div class="brand-icon-box"><mat-icon>auto_awesome</mat-icon></div>
+          <span class="brand-name">Qevixa</span>
+        </div>
+        <p>AI-Powered Quality Engineering & Test Automation Platform.</p>
+      </div>
+
+      <div class="footer-links-group">
+        <div class="link-col">
+          <h4>Platform</h4>
+          <a (click)="scrollToSection('capabilities')">Capabilities</a>
+          <a (click)="scrollToSection('ai-workflow')">AI Testing</a>
+          <a (click)="scrollToSection('accessibility')">WCAG Accessibility</a>
+          <a (click)="scrollToSection('analytics')">Quality Analytics</a>
+        </div>
+
+        <div class="link-col">
+          <h4>Demos</h4>
+          <a routerLink="/accessibility-test">WCAG Scanner Demo</a>
+          <a routerLink="/login">Enterprise Dashboard</a>
+        </div>
+
+        <div class="link-col">
+          <h4>Company</h4>
+          <a href="javascript:void(0)">About Qevixa</a>
+          <a href="javascript:void(0)">Security & Privacy</a>
+          <a href="javascript:void(0)">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Qevixa Inc. All rights reserved. Enterprise Quality Engineering Platform.</p>
+    </div>
+  </footer>
+
+</div>

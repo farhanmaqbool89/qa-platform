@@ -1,0 +1,41 @@
+.features-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.feature-textarea {
+  font-family: var(--font-mono) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.4 !important;
+}
+
+.header-with-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.features-table {
+  border-radius: 8px;
+  overflow: hidden;
+}

@@ -1,0 +1,99 @@
+<section class="projects-page">
+
+  <!-- PAGE HEADER BAR -->
+  <header class="projects-header glass-card">
+    <div class="header-left">
+      <div class="header-badge">
+        <mat-icon class="badge-icon">folder_special</mat-icon>
+      </div>
+      <div class="header-titles">
+        <h1>Workspace Projects & Environment Controls</h1>
+        <p class="subtitle">Manage target project URLs, browser parameters, and authentication credentials</p>
+      </div>
+    </div>
+
+    <button mat-raised-button color="primary" (click)="openAddDialog()" class="add-project-btn">
+      <mat-icon>add</mat-icon>
+      <span>Add New Project</span>
+    </button>
+  </header>
+
+  <!-- PROJECTS TABLE CARD -->
+  <mat-card class="projects-card glass-card">
+    <mat-card-content class="card-content-table">
+      <div class="table-container">
+        <table mat-table [dataSource]="(projects$ | async) ?? []" class="projects-table">
+          
+          <!-- PROJECT NAME -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Project Name</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="project-name-cell">
+                <mat-icon class="folder-icon">folder</mat-icon>
+                <strong>{{ row.name }}</strong>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- BASE URL -->
+          <ng-container matColumnDef="baseUrl">
+            <th mat-header-cell *matHeaderCellDef>Target Base URL</th>
+            <td mat-cell *matCellDef="let row">
+              <code class="url-code">{{ row.baseUrl }}</code>
+            </td>
+          </ng-container>
+
+          <!-- BROWSER -->
+          <ng-container matColumnDef="browser">
+            <th mat-header-cell *matHeaderCellDef>Default Browser</th>
+            <td mat-cell *matCellDef="let row">
+              <span class="browser-chip">
+                <mat-icon class="browser-icon">language</mat-icon>
+                {{ row.browser }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- USERNAME -->
+          <ng-container matColumnDef="username">
+            <th mat-header-cell *matHeaderCellDef>Auth Account</th>
+            <td mat-cell *matCellDef="let row">
+              <span class="user-chip">
+                <mat-icon class="user-icon">person</mat-icon>
+                {{ row.username }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- ACTIONS -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="action-cell-btns">
+                <button mat-icon-button color="primary" aria-label="Edit project" (click)="openEditDialog(row)" class="action-icon-btn">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" aria-label="Delete project" (click)="deleteProject(row.id)" class="action-icon-btn">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="project-row"></tr>
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell empty-cell" colspan="5">
+              <div class="empty-state-box">
+                <mat-icon class="empty-icon">folder_open</mat-icon>
+                <p>No project workspaces configured. Click <b>Add New Project</b> to create one!</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+</section>

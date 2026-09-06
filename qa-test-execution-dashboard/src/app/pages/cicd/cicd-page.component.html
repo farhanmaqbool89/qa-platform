@@ -1,0 +1,309 @@
+<section class="cicd-page">
+
+  <!-- Header Banner -->
+  <div class="page-header">
+    <div class="header-titles">
+      <h1>CI/CD Pipeline & Telemetry Hub</h1>
+      <p class="subtitle">Centralized Git context tracking (Commit SHA, Branch, PR#), API security, and multi-CI runner integration</p>
+    </div>
+    <div class="header-actions">
+      <span class="status-badge live-badge">
+        <span class="pulse-dot"></span>
+        Centralized Telemetry Active
+      </span>
+    </div>
+  </div>
+
+  <!-- Top Security & Integration Section -->
+  <div class="top-cards-grid">
+    
+    <!-- API KEY SECURITY CARD -->
+    <mat-card class="security-card">
+      <mat-card-header>
+        <mat-card-title>API Security & Access Tokens</mat-card-title>
+        <mat-card-subtitle>Manage <code>X-API-Key</code> tokens for CI/CD runners & CLI authentication</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="keys-list" *ngIf="activeApiKeys.length > 0">
+          <div class="key-row" *ngFor="let k of activeApiKeys">
+            <div class="key-info">
+              <mat-icon class="key-icon">key</mat-icon>
+              <code>{{ k.maskedKey }}</code>
+            </div>
+            <button mat-icon-button (click)="copyToClipboard(k.key, 'API Key Token')" title="Copy Secret Token">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="key-actions">
+          <button mat-stroked-button color="primary" (click)="generateNewApiKey()">
+            <mat-icon>add</mat-icon>
+            Generate New API Key
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- SLACK / TEAMS NOTIFICATIONS CARD -->
+    <mat-card class="notifications-card">
+      <mat-card-header>
+        <mat-card-title>Slack & Teams Webhook Alerts</mat-card-title>
+        <mat-card-subtitle>Automated execution pass/fail and WCAG audit alerts</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="notificationForm" class="notif-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Incoming Webhook URL</mat-label>
+            <input matInput formControlName="slackWebhookUrl" placeholder="https://hooks.slack.com/services/...">
+          </mat-form-field>
+
+          <div class="notif-actions">
+            <button mat-flat-button color="accent" (click)="sendTestNotificationAlert()" [disabled]="isSendingAlert">
+              <mat-icon>notifications_active</mat-icon>
+              {{ isSendingAlert ? 'Sending Alert...' : 'Send Test Notification' }}
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Generator & Snippets Section -->
+  <div class="grid-layout">
+    
+    <!-- LEFT: Webhook Generator & Form -->
+    <mat-card class="generator-card">
+      <mat-card-header>
+        <mat-card-title>Interactive Trigger Generator</mat-card-title>
+        <mat-card-subtitle>Configure Git build context and auto-generate pipeline scripts</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="webhookForm" class="generator-form">
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Trigger Action Type</mat-label>
+            <mat-select formControlName="triggerType">
+              <mat-option value="TEST_EXECUTION">Execute Cucumber BDD Test Suite</mat-option>
+              <mat-option value="ACCESSIBILITY_SCAN">Run Headless WCAG Accessibility Audit</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <ng-container *ngIf="webhookForm.value.triggerType === 'TEST_EXECUTION'">
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Feature File / Path</mat-label>
+                <input matInput formControlName="feature" placeholder="e.g. features/login.feature">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Scenario Tags Filter</mat-label>
+                <input matInput formControlName="tags" placeholder="e.g. @smoke, @regression">
+              </mat-form-field>
+            </div>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Target Environment</mat-label>
+              <mat-select formControlName="environment">
+                <mat-option value="staging">Staging Environment</mat-option>
+                <mat-option value="ci-runner">GitHub / GitLab CI Runner</mat-option>
+                <mat-option value="production">Production Smoke Environment</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ng-container>
+
+          <ng-container *ngIf="webhookForm.value.triggerType === 'ACCESSIBILITY_SCAN'">
+            <mat-form-field appearance="outline">
+              <mat-label>Target Application URL</mat-label>
+              <input matInput formControlName="targetUrl" placeholder="https://staging.app.internal">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>WCAG Standard Level</mat-label>
+              <mat-select formControlName="wcagStandard">
+                <mat-option value="WCAG2AA">WCAG 2.1 AA (Default)</mat-option>
+                <mat-option value="WCAG2A">WCAG 2.1 A</mat-option>
+                <mat-option value="WCAG2AAA">WCAG 2.1 AAA</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ng-container>
+
+          <!-- Git Context Controls -->
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Git Branch</mat-label>
+              <input matInput formControlName="branch" placeholder="e.g. main, feature/auth">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Commit SHA</mat-label>
+              <input matInput formControlName="commitSha" placeholder="e.g. a89c7d4">
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-flat-button color="primary" class="run-btn" (click)="executeWebhookNow()" [disabled]="isTriggering">
+              <mat-icon>play_arrow</mat-icon>
+              {{ isTriggering ? 'Executing Trigger...' : 'Run Webhook Trigger Now' }}
+            </button>
+            <span class="copy-toast" *ngIf="copyStatusMessage">{{ copyStatusMessage }}</span>
+          </div>
+
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- RIGHT: Code Snippet Preview (CLI, cURL, GitHub Actions) -->
+    <mat-card class="snippets-card">
+      <mat-card-header>
+        <mat-card-title>Pipeline Integration Code</mat-card-title>
+        <mat-card-subtitle>Copy official CLI commands, cURL scripts, or GitHub Actions YAML workflow steps</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-tab-group animationDuration="200ms" class="code-tabs">
+          
+          <!-- TAB 1: OFFICIAL CLI TOOL -->
+          <mat-tab label="Official CLI (npx)">
+            <div class="code-block-container">
+              <button class="copy-icon-btn" (click)="copyToClipboard(generatedCliCommand, 'Official CLI Command')" title="Copy CLI Command">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+              <pre><code>{{ generatedCliCommand }}</code></pre>
+            </div>
+            <div class="cli-hint">
+              <mat-icon>info</mat-icon>
+              <span>Auto-detects local Git branch & commit SHA automatically when run inside a repo!</span>
+            </div>
+          </mat-tab>
+
+          <!-- TAB 2: CURL -->
+          <mat-tab label="cURL Command">
+            <div class="code-block-container">
+              <button class="copy-icon-btn" (click)="copyToClipboard(generatedCurlCommand, 'cURL command')" title="Copy cURL Command">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+              <pre><code>{{ generatedCurlCommand }}</code></pre>
+            </div>
+          </mat-tab>
+
+          <!-- TAB 3: GITHUB ACTIONS -->
+          <mat-tab label="GitHub Actions Step">
+            <div class="code-block-container">
+              <button class="copy-icon-btn" (click)="copyToClipboard(generatedGithubActionsStep, 'GitHub Actions YAML')" title="Copy YAML Step">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+              <pre><code>{{ generatedGithubActionsStep }}</code></pre>
+            </div>
+          </mat-tab>
+
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Centralized Telemetry Log Table -->
+  <mat-card class="history-card">
+    <mat-card-header>
+      <div class="header-with-filter">
+        <div>
+          <mat-card-title>Centralized CI Execution & Telemetry Log</mat-card-title>
+          <mat-card-subtitle>Real-time telemetry tracking executions by origin source, Git branch, and commit SHA</mat-card-subtitle>
+        </div>
+
+        <!-- Source Origin Filter Chips -->
+        <div class="origin-filter-chips">
+          <button
+            class="filter-chip"
+            [class.active]="selectedOriginFilter === 'ALL'"
+            (click)="onFilterChange('ALL')"
+          >All</button>
+          <button
+            class="filter-chip"
+            [class.active]="selectedOriginFilter === 'GitHub Actions'"
+            (click)="onFilterChange('GitHub Actions')"
+          >GitHub Actions</button>
+          <button
+            class="filter-chip"
+            [class.active]="selectedOriginFilter === 'GitLab CI'"
+            (click)="onFilterChange('GitLab CI')"
+          >GitLab CI</button>
+          <button
+            class="filter-chip"
+            [class.active]="selectedOriginFilter === 'Jenkins'"
+            (click)="onFilterChange('Jenkins')"
+          >Jenkins</button>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <table mat-table [dataSource]="filteredHistory" class="mat-elevation-z1 webhook-table">
+        
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>Trigger ID</th>
+          <td mat-cell *matCellDef="let row">
+            <code>{{ row.id }}</code>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="sourceOrigin">
+          <th mat-header-cell *matHeaderCellDef>Source Origin</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="origin-badge" [ngClass]="'origin-' + (row.sourceOrigin || 'api').toLowerCase().replace(' ', '-')">
+              {{ row.sourceOrigin || row.source }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="gitContext">
+          <th mat-header-cell *matHeaderCellDef>Git Context (Branch / SHA)</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="git-meta">
+              <span class="branch-tag">🌿 {{ row.branch || 'main' }}</span>
+              <code class="sha-chip">{{ row.commitSha || 'c92a10d' }}</code>
+              <span class="pr-badge" *ngIf="row.prNumber && row.prNumber !== 'N/A'">PR #{{ row.prNumber }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="payloadSummary">
+          <th mat-header-cell *matHeaderCellDef>Payload Summary</th>
+          <td mat-cell *matCellDef="let row" class="payload-cell">
+            {{ row.payloadSummary }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="status-pill" [ngClass]="'status-' + row.status.toLowerCase()">
+              {{ row.status }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="durationMs">
+          <th mat-header-cell *matHeaderCellDef>Duration</th>
+          <td mat-cell *matCellDef="let row">{{ row.durationMs }}ms</td>
+        </ng-container>
+
+        <ng-container matColumnDef="timestamp">
+          <th mat-header-cell *matHeaderCellDef>Triggered At</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.timestamp | date:'medium' }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+</section>

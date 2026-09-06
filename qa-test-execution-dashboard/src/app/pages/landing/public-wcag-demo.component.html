@@ -1,0 +1,141 @@
+<div class="public-demo-layout">
+  
+  <header class="demo-header">
+    <div class="header-container">
+      <a routerLink="/" class="brand">
+        <mat-icon class="brand-icon">auto_awesome</mat-icon>
+        <span>Qevixa</span>
+      </a>
+      <span class="demo-badge">Public WCAG Scanner</span>
+      <div class="header-actions">
+        <a routerLink="/login" class="login-btn">Login to Dashboard →</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="demo-content">
+    <div class="demo-card">
+      <div class="card-intro">
+        <h1>Public WCAG Accessibility Scanner</h1>
+        <p>Audit any public website URL against WCAG 2.1 / 2.2 AA, ADA Title III, and Section 508 accessibility standards.</p>
+        <span class="rate-hint">🛡️ Public Scanner: Rate-limited to 5 scans per 10 minutes (http/https only).</span>
+      </div>
+
+      <div class="scan-input-box">
+        <div class="input-wrapper">
+          <mat-icon class="input-icon">language</mat-icon>
+          <input type="url" [(ngModel)]="targetUrl" placeholder="https://example.com" class="url-input" [disabled]="isScanning">
+        </div>
+        <button class="run-btn" (click)="runPublicScan()" [disabled]="isScanning || !targetUrl">
+          <mat-icon *ngIf="!isScanning">rocket_launch</mat-icon>
+          <mat-spinner *ngIf="isScanning" diameter="18"></mat-spinner>
+          <span>{{ isScanning ? 'Auditing Page...' : 'Run Full WCAG Audit' }}</span>
+        </button>
+      </div>
+
+      <!-- ERROR ALERT BANNER -->
+      <div class="error-banner" *ngIf="errorMessage">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <!-- FULL COMPREHENSIVE SCAN REPORT -->
+      <div class="results-container" *ngIf="scanResult">
+        
+        <!-- Report Header -->
+        <div class="results-header">
+          <div class="target-meta">
+            <h2>{{ scanResult.targetTitle || 'Audit Target Page' }}</h2>
+            <a [href]="scanResult.url" target="_blank" class="url-link">{{ scanResult.url }}</a>
+            <span class="scan-time" *ngIf="scanResult.scanTime">Audited on {{ scanResult.scanTime | date:'medium' }}</span>
+          </div>
+
+          <div class="score-badge" [class.pass]="scanResult.score >= 80" [class.warn]="scanResult.score < 80">
+            <span class="score-num">{{ scanResult.score }}%</span>
+            <span class="score-lbl">WCAG Score</span>
+          </div>
+        </div>
+
+        <!-- 4-Column Severity Summary Grid -->
+        <div class="summary-chips">
+          <div class="chip critical">
+            <span class="val">{{ scanResult.summary?.criticalCount ?? (scanResult.criticalIssues?.length || 0) }}</span>
+            <span class="lbl">Critical</span>
+          </div>
+          <div class="chip serious">
+            <span class="val">{{ scanResult.summary?.seriousCount ?? (scanResult.seriousIssues?.length || 0) }}</span>
+            <span class="lbl">Serious</span>
+          </div>
+          <div class="chip moderate">
+            <span class="val">{{ scanResult.summary?.moderateCount ?? (scanResult.moderateIssues?.length || 0) }}</span>
+            <span class="lbl">Moderate</span>
+          </div>
+          <div class="chip minor">
+            <span class="val">{{ scanResult.summary?.minorCount ?? (scanResult.minorIssues?.length || 0) }}</span>
+            <span class="lbl">Minor</span>
+          </div>
+        </div>
+
+        <!-- Compliance Standard Checklist Grid -->
+        <div class="checklist-section" *ngIf="scanResult.complianceChecklist && scanResult.complianceChecklist.length > 0">
+          <h3>Standards Compliance Overview</h3>
+          <div class="checklist-grid">
+            <div class="check-card" *ngFor="let item of scanResult.complianceChecklist" [class.pass]="item.compliant" [class.fail]="!item.compliant">
+              <mat-icon class="check-icon">{{ item.compliant ? 'check_circle' : 'warning' }}</mat-icon>
+              <div class="check-meta">
+                <span class="check-title">{{ item.title }}</span>
+                <span class="check-sub">{{ item.compliant ? 'Fully Compliant' : (item.violationsCount + ' Violations Found') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FULL VIOLATION FINDINGS LIST -->
+        <div class="violations-list" *ngIf="(scanResult.allViolations && scanResult.allViolations.length > 0) || (scanResult.violations && scanResult.violations.length > 0)">
+          <h3>Accessibility Violation Details ({{ (scanResult.allViolations || scanResult.violations || []).length }})</h3>
+          
+          <div class="v-card" *ngFor="let v of (scanResult.allViolations || scanResult.violations || [])">
+            <div class="v-header">
+              <span class="v-impact" [ngClass]="v.impact">{{ v.impact | uppercase }}</span>
+              <span class="v-id">{{ v.id }}</span>
+              <a *ngIf="v.helpUrl" [href]="v.helpUrl" target="_blank" class="help-link">Rule Doc ↗</a>
+            </div>
+
+            <h4 class="v-help">{{ v.help }}</h4>
+            <p class="v-desc">{{ v.description }}</p>
+
+            <!-- Affected HTML Selector Nodes -->
+            <div class="v-nodes" *ngIf="v.nodes && v.nodes.length > 0">
+              <span class="nodes-title">Affected Elements ({{ v.nodes.length }}):</span>
+              <div class="node-item" *ngFor="let n of v.nodes | slice:0:3">
+                <code class="selector-code">{{ (n.target || []).join(' > ') }}</code>
+                <div class="html-snippet" *ngIf="n.html"><code>{{ n.html }}</code></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASSED AUDITS SUMMARY -->
+        <div class="passed-audits-section" *ngIf="scanResult.passedAudits && scanResult.passedAudits.length > 0">
+          <h3>Passed Audit Rules ({{ scanResult.passedAudits.length }})</h3>
+          <div class="passed-grid">
+            <div class="passed-card" *ngFor="let p of scanResult.passedAudits | slice:0:6">
+              <mat-icon class="pass-icon">check_circle_outline</mat-icon>
+              <div>
+                <span class="pass-title">{{ p.help || p.id }}</span>
+                <span class="pass-count">{{ p.passedNodesCount }} elements verified compliant</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-cta-footer">
+          <p>Want automated CI/CD scans, PDF exports, and longitudinal WCAG compliance tracking?</p>
+          <a routerLink="/login" class="full-access-btn">Login to Full Qevixa Platform →</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+</div>

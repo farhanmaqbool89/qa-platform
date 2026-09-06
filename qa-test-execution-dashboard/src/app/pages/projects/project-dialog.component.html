@@ -1,0 +1,57 @@
+<div class="project-dialog">
+  <div class="dialog-header">
+    <div class="header-icon">
+      <mat-icon>{{ data ? 'edit_note' : 'folder_special' }}</mat-icon>
+    </div>
+    <div class="header-text">
+      <h2 mat-dialog-title>{{ data ? 'Edit Project Workspace' : 'Add New Project Workspace' }}</h2>
+      <p class="dialog-sub">Configure target endpoint URLs, default browser engine, and authentication credentials</p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="form" (ngSubmit)="save()" class="project-form">
+      <div class="form-grid-2">
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Project Name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. Customer Portal" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Default Browser Engine</mat-label>
+          <mat-select formControlName="browser">
+            <mat-option *ngFor="let browser of browserOptions" [value]="browser">{{ browser }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="form-field-full">
+        <mat-label>Target Base URL</mat-label>
+        <input matInput formControlName="baseUrl" placeholder="https://qa.customer-portal.local" />
+        <mat-icon matSuffix>language</mat-icon>
+      </mat-form-field>
+
+      <div class="form-grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Default Auth Username</mat-label>
+          <input matInput formControlName="username" placeholder="qa.user@example.com" />
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Default Auth Password</mat-label>
+          <input matInput type="password" formControlName="password" placeholder="••••••••" />
+          <mat-icon matSuffix>lock</mat-icon>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button mat-dialog-close class="cancel-btn">Cancel</button>
+    <button mat-raised-button color="primary" (click)="save()" class="save-btn">
+      <mat-icon>check</mat-icon>
+      <span>{{ data ? 'Save Changes' : 'Create Project' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

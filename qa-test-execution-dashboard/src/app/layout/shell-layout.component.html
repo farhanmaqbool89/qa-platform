@@ -1,0 +1,261 @@
+<div class="shell-layout" [class.is-collapsed]="isCollapsed">
+  
+  <!-- MOBILE DRAWER BACKDROP -->
+  <div class="mobile-nav-backdrop" *ngIf="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
+
+  <!-- MOBILE SIDEBAR DRAWER -->
+  <aside class="mobile-drawer" [class.open]="isMobileMenuOpen">
+    <div class="mobile-drawer-header">
+      <a class="brand-link" [routerLink]="['/dashboard']" (click)="closeMobileMenu()">
+        <div class="brand-logo">
+          <mat-icon class="brand-icon">auto_awesome</mat-icon>
+        </div>
+        <div class="brand-info">
+          <span class="brand-name">Qevixa</span>
+          <span class="brand-tag">QA Platform</span>
+        </div>
+      </a>
+      <button class="mobile-close-btn" (click)="closeMobileMenu()" aria-label="Close mobile menu">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <nav class="mobile-drawer-nav">
+      <div class="nav-group" *ngFor="let section of navSections">
+        <div class="group-title">{{ section.title }}</div>
+        <ul class="nav-menu">
+          <li *ngFor="let item of section.items">
+            <a
+              class="nav-link"
+              [routerLink]="item.route"
+              routerLinkActive="active"
+              (click)="closeMobileMenu()"
+            >
+              <div class="nav-icon-wrapper">
+                <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+              </div>
+              <span class="nav-text">{{ item.label }}</span>
+              <span class="nav-pill" *ngIf="item.badge" [ngClass]="'pill-' + (item.badgeColor || 'primary')">
+                {{ item.badge }}
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="mobile-drawer-footer">
+      <div class="engine-status-pill" [class.offline]="!isEngineOnline">
+        <span class="status-indicator" [class.online]="isEngineOnline" [class.offline]="!isEngineOnline"></span>
+        <div class="engine-info">
+          <span class="engine-title">{{ isEngineOnline ? 'Engine Active' : 'Engine Offline' }}</span>
+          <span class="engine-url">{{ isEngineOnline ? 'ws://localhost:3000' : 'Disconnected' }}</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- DESKTOP SIDEBAR NAVIGATION DRAWER -->
+  <aside class="sidebar desktop-sidebar" [class.collapsed]="isCollapsed">
+    
+    <!-- Brand Header -->
+    <div class="sidebar-header">
+      <a class="brand-link" [routerLink]="['/dashboard']" [title]="'Qevixa QA Automation Suite'">
+        <div class="brand-logo">
+          <mat-icon class="brand-icon">auto_awesome</mat-icon>
+          <div class="logo-glow"></div>
+        </div>
+        <div class="brand-info" *ngIf="!isCollapsed">
+          <span class="brand-name">Qevixa</span>
+          <span class="brand-tag">QA Platform</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Navigation List -->
+    <nav class="sidebar-nav">
+      <div class="nav-group" *ngFor="let section of navSections">
+        <div class="group-title" *ngIf="!isCollapsed">{{ section.title }}</div>
+        <div class="group-divider" *ngIf="isCollapsed"></div>
+
+        <ul class="nav-menu">
+          <li *ngFor="let item of section.items">
+            <a
+              class="nav-link"
+              [routerLink]="item.route"
+              routerLinkActive="active"
+              [title]="isCollapsed ? item.label : ''"
+            >
+              <div class="nav-icon-wrapper">
+                <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+              </div>
+              
+              <span class="nav-text" *ngIf="!isCollapsed">{{ item.label }}</span>
+
+              <span class="nav-pill" *ngIf="item.badge && !isCollapsed" [ngClass]="'pill-' + (item.badgeColor || 'primary')">
+                {{ item.badge }}
+              </span>
+
+              <div class="active-glow"></div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Sidebar Footer: Engine Status & Bottom Expand/Collapse Button -->
+    <div class="sidebar-footer">
+      <div class="engine-status-pill" [class.offline]="!isEngineOnline" [title]="isEngineOnline ? 'Connected to WebSocket ws://localhost:3000' : 'Backend Engine Disconnected (http://localhost:3000)'">
+        <span class="status-indicator" [class.online]="isEngineOnline" [class.offline]="!isEngineOnline"></span>
+        <div class="engine-info" *ngIf="!isCollapsed">
+          <span class="engine-title">{{ isEngineOnline ? 'Engine Active' : 'Engine Offline' }}</span>
+          <span class="engine-url">{{ isEngineOnline ? 'ws://localhost:3000' : 'Disconnected' }}</span>
+        </div>
+      </div>
+
+      <!-- Single Bottom Expand / Collapse Toggle -->
+      <button class="bottom-toggle-btn" (click)="toggleSidebar()" [title]="isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'">
+        <mat-icon class="toggle-icon">{{ isCollapsed ? 'keyboard_double_arrow_right' : 'keyboard_double_arrow_left' }}</mat-icon>
+        <span class="toggle-label" *ngIf="!isCollapsed">Collapse Menu</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- MAIN BODY & TOP NAVIGATION BAR -->
+  <div class="main-wrapper">
+    
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <div class="nav-left">
+        <!-- Mobile Menu Hamburger Button -->
+        <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Toggle mobile menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <div class="page-title-badge">
+          <span class="app-label">Qevixa</span>
+          <span class="sep">/</span>
+          <span class="page-label">{{ activePageTitle }}</span>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <!-- Top Header Session Status Indicator -->
+        <div class="session-status-pill" [class.active]="hasActiveSession" [title]="hasActiveSession ? 'Authenticated Session Active (storageState.json)' : 'No Authenticated Session Saved'">
+          <mat-icon class="session-icon">{{ hasActiveSession ? 'vpn_key' : 'lock_open' }}</mat-icon>
+          <span class="session-label">
+            {{ hasActiveSession ? '🔑 Session Active | ' + activeProject + ' (' + activeEnvironment + ')' : 'No Saved Session' }}
+          </span>
+          <button class="session-action-btn record" *ngIf="!hasActiveSession" (click)="recordSession()" title="Record Session (Open Browser & Authenticate)">
+            Record Session
+          </button>
+          <button class="session-action-btn clear" *ngIf="hasActiveSession" (click)="clearActiveSession()" title="Clear Stored Session">
+            Clear Session
+          </button>
+        </div>
+
+        <!-- Open Browser & Scan WCAG Button -->
+        <button class="open-browser-btn" (click)="toggleScanModal()" title="Launch Interactive Desktop Browser & Scan Site WCAG">
+          <mat-icon class="btn-icon">open_in_browser</mat-icon>
+          <span>Open Browser & Scan</span>
+        </button>
+
+        <!-- Latency Badge -->
+        <div class="latency-badge" [class.offline]="!isEngineOnline">
+          <span class="latency-dot" [class.online]="isEngineOnline" [class.offline]="!isEngineOnline"></span>
+          <span class="latency-text">{{ isEngineOnline ? (latencyMs + 'ms Latency') : 'Engine Offline' }}</span>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button class="icon-action-btn" (click)="themeService.toggleTheme()" [title]="themeService.isDarkTheme ? 'Light Theme' : 'Dark Theme'">
+          <mat-icon>{{ themeService.isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
+        </button>
+
+        <!-- Notifications -->
+        <button class="icon-action-btn" title="Notifications">
+          <mat-icon>notifications_none</mat-icon>
+          <span class="notif-badge">3</span>
+        </button>
+
+        <!-- User Profile Pill -->
+        <div class="user-pill">
+          <div class="avatar">{{ (authService.currentUserValue?.name || 'QA').substring(0, 2).toUpperCase() }}</div>
+          <div class="user-meta">
+            <span class="name">{{ authService.currentUserValue?.name || authService.currentUserValue?.email || 'Farhan' }}</span>
+            <span class="role">{{ authService.currentUserValue?.role || 'Org Admin' }} • {{ authService.currentUserValue?.organization?.name || 'Acme QA' }}</span>
+          </div>
+          <button class="icon-action-btn logout-btn" (click)="onLogout()" title="Sign Out of Platform">
+            <mat-icon>logout</mat-icon>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- INTERACTIVE BROWSER & WCAG SCAN MODAL -->
+    <div class="scan-modal-backdrop" *ngIf="showScanModal" (click)="toggleScanModal()">
+      <div class="scan-modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <div class="modal-icon-wrapper">
+              <mat-icon class="modal-icon">open_in_browser</mat-icon>
+            </div>
+            <div>
+              <h3>Interactive Browser WCAG Scan</h3>
+              <p>Opens Chromium window on desktop & executes Axe Core audit on the live page.</p>
+            </div>
+          </div>
+          <button class="icon-close-btn" (click)="toggleScanModal()"><mat-icon>close</mat-icon></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Target Site Address (URL)</label>
+            <div class="url-input-wrapper">
+              <mat-icon class="url-icon">language</mat-icon>
+              <input type="url" [(ngModel)]="targetUrl" placeholder="https://example.com" class="custom-url-input">
+            </div>
+            <span class="form-hint">The interactive browser will open this URL visually on your screen before scanning.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Compliance Standards</label>
+            <div class="standards-chips">
+              <span class="std-chip active">WCAG 2.1 / 2.2 AA</span>
+              <span class="std-chip active">ADA Title III</span>
+              <span class="std-chip active">Section 508</span>
+              <span class="std-chip active">EAA EN 301 549</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="cancel-btn" (click)="toggleScanModal()">Cancel</button>
+          <button class="launch-scan-btn" (click)="startLiveWcagScan()" [disabled]="isScanning || !targetUrl">
+            <mat-icon *ngIf="!isScanning">rocket_launch</mat-icon>
+            <mat-spinner *ngIf="isScanning" diameter="18"></mat-spinner>
+            <span>{{ isScanning ? 'Opening Browser & Scanning...' : 'Launch Browser & Scan WCAG' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Router Outlet Container -->
+    <main class="page-container">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- FLOATING SCAN STATUS TOAST -->
+    <div class="scan-status-toast" *ngIf="showScanStatus" (click)="showScanStatus = false">
+      <div class="toast-content">
+        <mat-icon class="toast-icon">open_in_browser</mat-icon>
+        <span class="toast-message">{{ scanStatusMessage }}</span>
+        <button class="toast-link" (click)="$event.stopPropagation(); showScanStatus = false; router.navigate(['/accessibility'])">
+          Go to Results →
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>

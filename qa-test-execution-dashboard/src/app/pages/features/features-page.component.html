@@ -1,0 +1,101 @@
+<section class="features-page">
+  <div class="features-grid">
+    <mat-card class="editor-card">
+      <mat-card-header>
+        <mat-card-title>Feature Management</mat-card-title>
+        <mat-card-subtitle>Upload and edit feature files for your QA projects</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="row-actions">
+          <input #fileInput type="file" accept=".feature" (change)="uploadFeatureFile($event)" style="display: none" />
+          <button mat-stroked-button color="primary" type="button" (click)="fileInput.click()">
+            <mat-icon>upload_file</mat-icon>
+            Upload .feature file
+          </button>
+        </div>
+
+        <form [formGroup]="form" class="feature-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Project</mat-label>
+            <mat-select formControlName="projectId">
+              <mat-option value="0" disabled>Select a project</mat-option>
+              <mat-option *ngFor="let project of (projects$ | async) ?? []" [value]="project.id">
+                {{ project.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Feature name</mat-label>
+            <input matInput formControlName="name" placeholder="example.feature" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="feature-textarea">
+            <mat-label>Feature content</mat-label>
+            <textarea matInput formControlName="content" rows="10"></textarea>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" type="button" (click)="saveFeature()">
+            <mat-icon>save</mat-icon>
+            Save Feature
+          </button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="list-card">
+      <mat-card-header>
+        <div class="header-with-filter">
+          <div>
+            <mat-card-title>Saved Features</mat-card-title>
+            <mat-card-subtitle>Manage your feature files</mat-card-subtitle>
+          </div>
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Filter by Project</mat-label>
+            <mat-select [formControl]="filterForm.controls.projectId">
+              <mat-option [value]="0">All Projects</mat-option>
+              <mat-option *ngFor="let project of (projects$ | async) ?? []" [value]="project.id">
+                {{ project.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <ng-container *ngIf="projects$ | async as projects">
+          <table mat-table [dataSource]="(filteredFeatures$ | async) ?? []" class="features-table mat-elevation-z1">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Feature</th>
+              <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="updatedAt">
+              <th mat-header-cell *matHeaderCellDef>Updated</th>
+              <td mat-cell *matCellDef="let row">{{ row.updatedAt | date:'medium' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let row">
+                <button mat-icon-button color="primary" type="button" (click)="editFeature(row)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" type="button" (click)="deleteFeature(row)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell" colspan="3">No feature files found for the selected project.</td>
+            </tr>
+          </table>
+        </ng-container>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>
+

@@ -1,0 +1,340 @@
+.public-demo-layout {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.demo-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+
+  .header-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: #0f172a;
+      font-size: 1.2rem;
+      font-weight: 800;
+
+      .brand-icon { color: #005cbb; }
+    }
+
+    .demo-badge {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #005cbb;
+      background: #eff6ff;
+      padding: 0.25rem 0.75rem;
+      border-radius: 99px;
+      border: 1px solid #bfdbfe;
+    }
+
+    .login-btn {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #005cbb;
+      text-decoration: none;
+    }
+  }
+}
+
+.demo-content {
+  max-width: 950px;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+
+  .demo-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 2.25rem;
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+
+    .card-intro {
+      text-align: center;
+      margin-bottom: 2rem;
+
+      h1 { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin: 0 0 0.5rem; }
+      p { font-size: 0.95rem; color: #64748b; margin: 0 0 0.75rem; }
+      .rate-hint { font-size: 0.78rem; font-weight: 600; color: #0284c7; background: #e0f2fe; padding: 0.25rem 0.65rem; border-radius: 6px; }
+    }
+
+    .scan-input-box {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+
+      @media (max-width: 580px) { flex-direction: column; }
+
+      .input-wrapper {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: center;
+
+        .input-icon {
+          position: absolute;
+          left: 0.85rem;
+          color: #94a3b8;
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+
+        .url-input {
+          width: 100%;
+          padding: 0.75rem 0.85rem 0.75rem 2.6rem;
+          border-radius: 10px;
+          border: 1px solid #cbd5e1;
+          font-size: 0.95rem;
+          outline: none;
+
+          &:focus { border-color: #005cbb; box-shadow: 0 0 0 3px rgba(0, 92, 187, 0.15); }
+        }
+      }
+
+      .run-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.75rem 1.4rem;
+        border-radius: 10px;
+        background: #005cbb;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.92rem;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
+
+        &:hover:not(:disabled) { background: #004896; }
+        &:disabled { opacity: 0.6; cursor: not-allowed; }
+      }
+    }
+
+    .error-banner {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1rem;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .results-container {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 1.75rem;
+
+      .results-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+
+        .target-meta {
+          h2 { font-size: 1.3rem; font-weight: 800; color: #0f172a; margin: 0 0 0.2rem; }
+          .url-link { font-size: 0.85rem; color: #005cbb; text-decoration: none; font-weight: 600; display: inline-block; margin-right: 0.75rem; }
+          .scan-time { font-size: 0.78rem; color: #94a3b8; }
+        }
+
+        .score-badge {
+          padding: 0.6rem 1.25rem;
+          border-radius: 12px;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+
+          &.pass { background: #ecfdf5; border: 1px solid #6ee7b7; .score-num { color: #059669; } }
+          &.warn { background: #fffbebfb; border: 1px solid #fde68a; .score-num { color: #d97706; } }
+
+          .score-num { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+          .score-lbl { font-size: 0.68rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-top: 0.2rem; }
+        }
+      }
+
+      .summary-chips {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+
+        .chip {
+          padding: 0.85rem;
+          border-radius: 12px;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+
+          .val { font-size: 1.5rem; font-weight: 800; }
+          .lbl { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; margin-top: 0.2rem; }
+
+          &.critical { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+          &.serious { background: #fff7ed; border: 1px solid #ffedd5; color: #c2410c; }
+          &.moderate { background: #fffbeb; border: 1px solid #fef3c7; color: #b45309; }
+          &.minor { background: #f0fdf4; border: 1px solid #dcfce7; color: #15803d; }
+        }
+      }
+
+      /* COMPLIANCE CHECKLIST GRID */
+      .checklist-section {
+        margin-bottom: 2rem;
+        h3 { font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0 0 0.85rem; }
+
+        .checklist-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.75rem;
+
+          @media (max-width: 600px) { grid-template-columns: 1fr; }
+
+          .check-card {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+
+            &.pass {
+              border-color: #a7f3d0;
+              background: #f0fdf4;
+              .check-icon { color: #059669; }
+            }
+
+            &.fail {
+              border-color: #fca5a5;
+              background: #fef2f2;
+              .check-icon { color: #dc2626; }
+            }
+
+            .check-meta {
+              display: flex;
+              flex-direction: column;
+              .check-title { font-size: 0.88rem; font-weight: 700; color: #0f172a; }
+              .check-sub { font-size: 0.75rem; color: #64748b; }
+            }
+          }
+        }
+      }
+
+      /* VIOLATION FINDINGS LIST */
+      .violations-list {
+        margin-bottom: 2rem;
+        h3 { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 1rem; }
+
+        .v-card {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 1.25rem;
+          margin-bottom: 1rem;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+
+          .v-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+
+            .v-impact {
+              font-size: 0.68rem;
+              font-weight: 800;
+              padding: 0.2rem 0.55rem;
+              border-radius: 6px;
+              letter-spacing: 0.5px;
+              &.critical { background: #ef4444; color: #ffffff; }
+              &.serious { background: #f97316; color: #ffffff; }
+              &.moderate { background: #f59e0b; color: #ffffff; }
+              &.minor { background: #10b981; color: #ffffff; }
+            }
+
+            .v-id { font-size: 0.82rem; font-weight: 700; color: #64748b; font-family: monospace; }
+            .help-link { font-size: 0.78rem; font-weight: 600; color: #005cbb; text-decoration: none; }
+          }
+
+          .v-help { font-size: 1rem; font-weight: 700; color: #0f172a; margin: 0 0 0.35rem; }
+          .v-desc { font-size: 0.88rem; color: #475569; margin: 0 0 0.85rem; line-height: 1.5; }
+
+          .v-nodes {
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 8px;
+            padding: 0.75rem;
+
+            .nodes-title { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 0.4rem; display: block; }
+
+            .node-item {
+              margin-top: 0.4rem;
+              .selector-code { font-size: 0.78rem; color: #005cbb; background: #eff6ff; padding: 0.15rem 0.4rem; border-radius: 4px; font-family: monospace; }
+              .html-snippet { margin-top: 0.25rem; font-size: 0.78rem; color: #334155; font-family: monospace; background: #ffffff; border: 1px solid #e2e8f0; padding: 0.3rem 0.5rem; border-radius: 4px; overflow-x: auto; }
+            }
+          }
+        }
+      }
+
+      /* PASSED AUDITS GRID */
+      .passed-audits-section {
+        margin-bottom: 2rem;
+        h3 { font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0 0 0.85rem; }
+
+        .passed-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.6rem;
+
+          @media (max-width: 600px) { grid-template-columns: 1fr; }
+
+          .passed-card {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.65rem 0.85rem;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 8px;
+
+            .pass-icon { color: #059669; font-size: 18px; width: 18px; height: 18px; }
+            .pass-title { font-size: 0.82rem; font-weight: 700; color: #334155; display: block; }
+            .pass-count { font-size: 0.72rem; color: #64748b; display: block; }
+          }
+        }
+      }
+
+      .demo-cta-footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+        text-align: center;
+
+        p { font-size: 0.9rem; color: #64748b; margin: 0 0 0.85rem; }
+
+        .full-access-btn {
+          display: inline-block;
+          padding: 0.65rem 1.25rem;
+          border-radius: 8px;
+          background: #005cbb;
+          color: #ffffff;
+          font-weight: 700;
+          font-size: 0.9rem;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+<div class="auth-container">
+  <div class="auth-box glass-card">
+    <div class="brand-header">
+      <div class="brand-logo">
+        <mat-icon>shield</mat-icon>
+      </div>
+      <h2>AI QA Platform</h2>
+      <p class="subtitle">Enterprise SaaS Testing Authentication</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="auth-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email Address</mat-label>
+        <input matInput type="email" [(ngModel)]="email" name="email" required placeholder="admin@qa-platform.com" />
+        <mat-icon matSuffix>email</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" [(ngModel)]="password" name="password" required />
+        <mat-icon matSuffix>lock</mat-icon>
+      </mat-form-field>
+
+      <div class="forgot-link">
+        <a routerLink="/forgot-password">Forgot password?</a>
+      </div>
+
+      <button mat-raised-button color="primary" type="submit" [disabled]="loading" class="auth-btn">
+        <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+        <span *ngIf="!loading">Sign In</span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <span>Don't have an account?</span>
+      <a routerLink="/register" class="link-highlight">Register Organization</a>
+    </div>
+  </div>
+</div>

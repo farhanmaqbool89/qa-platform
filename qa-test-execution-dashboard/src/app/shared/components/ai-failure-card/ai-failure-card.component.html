@@ -1,0 +1,209 @@
+<mat-card class="ai-card" *ngIf="analysis">
+  <!-- HEADER BAR -->
+  <div class="ai-header">
+    <div class="header-left">
+      <div class="ai-badge">
+        <mat-icon class="pulse-icon">psychology</mat-icon>
+        <span>Platform AI Failure Diagnosis</span>
+      </div>
+      <span class="rule-tag" matTooltip="Rule Engine Version">v{{ analysis.ruleEngineVersion }}</span>
+      <span class="rule-id-chip" [ngClass]="{ 'fallback-rule': analysis.matchedRuleId === 'RULE_FALLBACK_001' }" matTooltip="Matched Rule ID">
+        {{ analysis.matchedRuleId }}
+      </span>
+      <span class="exception-chip" *ngIf="analysis.exceptionType" matTooltip="Parsed Exception Type">
+        ⚡ {{ analysis.exceptionType }}
+      </span>
+    </div>
+
+    <div class="header-right">
+      <!-- Confidence Badge -->
+      <span class="confidence-pill" [ngClass]="{
+        'high-confidence': analysis.confidence >= 80,
+        'medium-confidence': analysis.confidence >= 60 && analysis.confidence < 80,
+        'low-confidence': analysis.confidence < 60
+      }">
+        <mat-icon>verified</mat-icon>
+        {{ analysis.confidence }}% Confidence
+      </span>
+
+      <!-- Evidence Strength Score Badge -->
+      <span class="strength-pill" matTooltip="Evidence Strength Rating based on collected logs, stack traces & artifacts">
+        <mat-icon>analytics</mat-icon>
+        Evidence: {{ analysis.evidenceStrengthScore }}/100
+      </span>
+
+      <!-- Origin Badge -->
+      <span class="origin-chip" [ngClass]="analysis.issueOrigin.toLowerCase()">
+        <ng-container [ngSwitch]="analysis.issueOrigin">
+          <span *ngSwitchCase="'TEST_SCRIPT_ISSUE'">⚙️ Test Script Issue</span>
+          <span *ngSwitchCase="'APPLICATION_BUG'">🐞 Application Bug</span>
+          <span *ngSwitchCase="'ENVIRONMENT_ISSUE'">☁️ Environment Issue</span>
+          <span *ngSwitchCase="'NETWORK_ISSUE'">🌐 Network Issue</span>
+          <span *ngSwitchDefault>⚠️ {{ analysis.issueOrigin }}</span>
+        </ng-container>
+      </span>
+
+      <!-- Severity Badge -->
+      <span class="severity-badge" [ngClass]="analysis.severity.toLowerCase()">
+        {{ analysis.severity }}
+      </span>
+    </div>
+  </div>
+
+  <mat-card-content class="ai-body">
+    <!-- CONTEXT & CODE LOCATION BAR -->
+    <div class="code-location-bar">
+      <mat-icon>code</mat-icon>
+      <span class="loc-label">Scenario Context:</span>
+      <code class="loc-file">{{ analysis.scenarioName || 'Execution Scenario' }}</code>
+      
+      <ng-container *ngIf="analysis.codeLocation && analysis.codeLocation.file !== 'Unknown File'">
+        <span class="loc-label">Location:</span>
+        <code class="loc-file">{{ analysis.codeLocation.file }}:{{ analysis.codeLocation.line }}</code>
+        <span class="loc-method">Method: <code>{{ analysis.codeLocation.method }}</code></span>
+      </ng-container>
+
+      <!-- FAILED LOCATOR CHIP -->
+      <span class="locator-chip" *ngIf="analysis.failedLocator">
+        <mat-icon class="chip-icon">center_focus_strong</mat-icon>
+        <span>Locator: <code>{{ analysis.failedLocator }}</code></span>
+      </span>
+
+      <!-- FAILED ASSERTION CHIP -->
+      <span class="assertion-chip" *ngIf="analysis.failedAssertion">
+        <mat-icon class="chip-icon">gavel</mat-icon>
+        <span>Assertion: <code>{{ analysis.failedAssertion }}</code></span>
+      </span>
+    </div>
+
+    <!-- EVIDENCE BREAKDOWN JUSTIFICATION BAR -->
+    <div class="evidence-breakdown-bar" *ngIf="analysis.evidenceBreakdown">
+      <div class="breakdown-title">
+        <mat-icon>find_in_page</mat-icon>
+        <span>Evidence Breakdown & Confidence Justification:</span>
+      </div>
+      <div class="breakdown-chips">
+        <span class="ev-chip available" *ngFor="let ev of analysis.evidenceBreakdown.available" matTooltip="Verified Available Evidence">
+          ✓ {{ ev }}
+        </span>
+        <span class="ev-chip missing" *ngFor="let ev of analysis.evidenceBreakdown.missing" matTooltip="Missing Evidence Source">
+          ✗ {{ ev }}
+        </span>
+      </div>
+      <span class="justification-text" *ngIf="analysis.evidenceBreakdown.justification">
+        💡 <em>{{ analysis.evidenceBreakdown.justification }}</em>
+      </span>
+    </div>
+
+    <!-- OBSERVED FAILURE / CONFIRMED ROOT CAUSE BOX -->
+    <div class="root-cause-box" [ngClass]="{ 'confirmed-cause': analysis.isRootCauseConfirmed }">
+      <div class="box-title">
+        <mat-icon>{{ analysis.isRootCauseConfirmed ? 'check_circle' : 'error_outline' }}</mat-icon>
+        <span>{{ analysis.causeLabel || (analysis.isRootCauseConfirmed ? 'Confirmed Root Cause' : 'Observed Failure') }}</span>
+      </div>
+      <p class="summary-text">{{ analysis.observedFailure || analysis.rootCauseSummary }}</p>
+      <div class="affected-step" *ngIf="analysis.affectedStep">
+        <span class="step-label">Affected Step:</span>
+        <code class="step-code">{{ analysis.affectedStep }}</code>
+      </div>
+    </div>
+
+    <div class="analysis-grid">
+      <!-- SECTION 1: OBSERVED FACTS -->
+      <div class="facts-column">
+        <div class="section-heading">
+          <mat-icon>fact_check</mat-icon>
+          <span>1. Observed Facts (Verified Evidence)</span>
+        </div>
+        <ul class="facts-list">
+          <li *ngFor="let fact of analysis.observedFacts">
+            <mat-icon class="fact-icon">check_circle</mat-icon>
+            <span>{{ fact }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- SECTION 2: TECHNICAL INFERENCE & POSSIBLE CAUSES -->
+      <div class="inference-column">
+        <div class="section-heading">
+          <mat-icon>lightbulb</mat-icon>
+          <span>2. Technical Inference</span>
+        </div>
+        <p class="inference-text">{{ analysis.technicalInference }}</p>
+
+        <div class="possible-causes" *ngIf="analysis.possibleCauses && analysis.possibleCauses.length > 0">
+          <span class="causes-title">Possible Secondary Causes:</span>
+          <ul>
+            <li *ngFor="let cause of analysis.possibleCauses">{{ cause }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: CATEGORIZED RECOMMENDATIONS -->
+    <div class="recommendations-section" *ngIf="analysis.categorizedRecommendations">
+      <div class="section-heading">
+        <mat-icon>build</mat-icon>
+        <span>3. Categorized Actionable Fix Recommendations</span>
+      </div>
+
+      <div class="rec-grid">
+        <!-- Developer Actions -->
+        <div class="rec-card dev-rec" *ngIf="analysis.categorizedRecommendations.developerActions?.length">
+          <div class="rec-card-title">
+            <mat-icon>code</mat-icon>
+            <span>Developer Actions</span>
+          </div>
+          <ul>
+            <li *ngFor="let act of analysis.categorizedRecommendations.developerActions">{{ act }}</li>
+          </ul>
+        </div>
+
+        <!-- QA Actions -->
+        <div class="rec-card qa-rec" *ngIf="analysis.categorizedRecommendations.qaActions?.length">
+          <div class="rec-card-title">
+            <mat-icon>bug_report</mat-icon>
+            <span>QA Automation Actions</span>
+          </div>
+          <ul>
+            <li *ngFor="let act of analysis.categorizedRecommendations.qaActions">{{ act }}</li>
+          </ul>
+        </div>
+
+        <!-- Infrastructure Actions -->
+        <div class="rec-card infra-rec" *ngIf="analysis.categorizedRecommendations.infrastructureActions?.length">
+          <div class="rec-card-title">
+            <mat-icon>dns</mat-icon>
+            <span>Infrastructure & DevOps Actions</span>
+          </div>
+          <ul>
+            <li *ngFor="let act of analysis.categorizedRecommendations.infrastructureActions">{{ act }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER ACTIONS & METRICS -->
+    <div class="ai-footer">
+      <div class="footer-metrics">
+        <span>⏱️ Duration: <strong>{{ analysis.durationMs }}ms</strong></span>
+        <span>📄 Execution: <strong>#{{ analysis.executionId }}</strong></span>
+        <span>🕒 Created: <strong>{{ analysis.createdAt | date:'short' }}</strong></span>
+      </div>
+
+      <div class="footer-actions">
+        <button mat-stroked-button color="accent" (click)="reanalyzeWithAi()" [disabled]="isAnalyzing">
+          <mat-icon [class.spin]="isAnalyzing">refresh</mat-icon>
+          Re-analyze
+        </button>
+
+        <button mat-raised-button color="primary" (click)="copyMarkdownAnalysis()">
+          <mat-icon>content_copy</mat-icon>
+          Copy Markdown Analysis
+        </button>
+
+        <span class="copy-toast" *ngIf="copyToastMessage">{{ copyToastMessage }}</span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

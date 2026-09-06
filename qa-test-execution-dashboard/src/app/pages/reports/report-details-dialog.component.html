@@ -1,0 +1,22 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Report Details</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <p><strong>Project:</strong> {{ data.projectName }}</p>
+    <p><strong>Feature:</strong> {{ data.featureName }}</p>
+    <p><strong>Environment:</strong> {{ data.environment }}</p>
+    <p><strong>Status:</strong> {{ data.status }}</p>
+    <p><strong>Duration:</strong> {{ data.durationSeconds }}s</p>
+    <p><strong>Executed At:</strong> {{ data.executedAt | date:'medium' }}</p>
+    <div class="details-block">
+      <strong>Details</strong>
+      <p>{{ data.details }}</p>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions align="end">
+    <button mat-button mat-dialog-close>Close</button>
+  </mat-card-actions>
+</mat-card>

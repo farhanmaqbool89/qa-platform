@@ -1,0 +1,359 @@
+<section class="reports-page">
+
+  <!-- PAGE HEADER BAR -->
+  <header class="reports-header glass-card">
+    <div class="header-left">
+      <div class="header-badge">
+        <mat-icon class="badge-icon">insights</mat-icon>
+      </div>
+      <div class="header-titles">
+        <h1>Advanced Reporting & Analytics</h1>
+        <p class="subtitle">Longitudinal execution trends, flaky test diagnostics, and WCAG compliance progression</p>
+      </div>
+    </div>
+
+    <div class="header-actions" *ngIf="reports$ | async as reports">
+      <button mat-raised-button color="primary" class="export-btn" (click)="exportPdf()">
+        <mat-icon>picture_as_pdf</mat-icon>
+        <span>Export Executive PDF</span>
+      </button>
+      <button mat-flat-button class="export-btn export-csv-btn" (click)="exportExecutionCsv(reports)">
+        <mat-icon>download</mat-icon>
+        <span>Export Raw CSV</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- EXECUTIVE SUMMARY STAT CARDS -->
+  <div class="stats-grid" *ngIf="summary">
+    <mat-card class="stat-card glass-card card-primary">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper cyan">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Overall Pass Rate</span>
+          <span class="stat-value">{{ summary.passRate }}%</span>
+          <span class="stat-subtext">{{ summary.passedExecutions }} of {{ summary.totalExecutions }} runs passed</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card glass-card card-accent">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper emerald">
+          <mat-icon>accessibility_new</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Avg Accessibility Score</span>
+          <span class="stat-value">{{ summary.avgAccessibilityScore }}/100</span>
+          <span class="stat-subtext">{{ summary.totalAccessibilityScans }} WCAG scans completed</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card glass-card card-warning">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper amber">
+          <mat-icon>warning_amber</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Flaky Scenarios</span>
+          <span class="stat-value">{{ flakyTests.length }}</span>
+          <span class="stat-subtext">Intermittent failures detected</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card glass-card card-info">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper blue">
+          <mat-icon>timer</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Avg Duration</span>
+          <span class="stat-value">{{ summary.avgDurationSeconds }}s</span>
+          <span class="stat-subtext">Per scenario execution</span>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- TABBED ANALYTICS VIEWS -->
+  <mat-card class="analytics-card glass-card">
+    <mat-tab-group animationDuration="150ms" class="styled-analytics-tabs">
+      
+      <!-- TAB 1: EXECUTIVE ANALYTICS & TRENDS -->
+      <mat-tab>
+        <ng-template matTabLabel>
+          <div class="tab-label-flex">
+            <mat-icon>bar_chart</mat-icon>
+            <span>Execution Trends</span>
+          </div>
+        </ng-template>
+
+        <div class="tab-pane">
+          <!-- 7-Day Pass/Fail Bar Chart Section -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <h3>7-Day Historical Pass/Fail Trend</h3>
+                <p class="chart-sub">Daily run distributions and pass rate percentages</p>
+              </div>
+              <span class="badge-hint">Daily Execution Runs</span>
+            </div>
+
+            <!-- Clean SVG Bar Chart -->
+            <div class="bar-chart-container" *ngIf="trends.length > 0">
+              <div class="chart-bars-row">
+                <div class="chart-col" *ngFor="let item of trends">
+                  <div class="col-rate-badge">{{ item.passRate }}%</div>
+                  <div class="bars-track" [matTooltip]="item.dayName + ': ' + item.passed + ' Passed, ' + item.failed + ' Failed'">
+                    <div class="bar-fill pass-bar" [style.height.%]="(item.passed / (item.total || 1)) * 100"></div>
+                    <div class="bar-fill fail-bar" [style.height.%]="(item.failed / (item.total || 1)) * 100" *ngIf="item.failed > 0"></div>
+                  </div>
+                  <span class="col-day">{{ item.dayName }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Failure Taxonomy Breakdown -->
+          <div class="failure-breakdown-card">
+            <div class="card-title-group">
+              <h3>Top Failure Causes & Bottlenecks</h3>
+              <p>Root cause taxonomy classified by diagnostic log parser</p>
+            </div>
+
+            <div class="failure-items-list">
+              <div class="failure-item-row">
+                <div class="failure-meta">
+                  <div class="error-badge rose">
+                    <mat-icon>error_outline</mat-icon>
+                  </div>
+                  <div class="failure-details">
+                    <strong>ElementNotFound (Timeout 5000ms)</strong>
+                    <p>Dynamic locator failed to resolve target element within expected threshold.</p>
+                  </div>
+                </div>
+                <div class="failure-stat">
+                  <span class="count-pill">4 Occurrences</span>
+                  <span class="pct-pill rose">66% Rate</span>
+                </div>
+              </div>
+
+              <div class="failure-item-row">
+                <div class="failure-meta">
+                  <div class="error-badge amber">
+                    <mat-icon>schedule</mat-icon>
+                  </div>
+                  <div class="failure-details">
+                    <strong>API Gateway Network Timeout</strong>
+                    <p>MFA OTP SMS service webhook failed to return 200 OK within 10s timeout.</p>
+                  </div>
+                </div>
+                <div class="failure-stat">
+                  <span class="count-pill">2 Occurrences</span>
+                  <span class="pct-pill amber">34% Rate</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- TAB 2: FLAKY TEST MATRIX -->
+      <mat-tab>
+        <ng-template matTabLabel>
+          <div class="tab-label-flex">
+            <mat-icon>warning_amber</mat-icon>
+            <span>Flaky Test Matrix</span>
+            <span class="tab-badge" *ngIf="flakyTests.length">{{ flakyTests.length }}</span>
+          </div>
+        </ng-template>
+
+        <div class="tab-pane">
+          <div class="flaky-header-bar">
+            <div>
+              <h3>Unstable & High-Risk Test Scenarios</h3>
+              <p>Scenarios exhibiting intermittent pass/fail outcomes across recent runs</p>
+            </div>
+            <button mat-outlined-button color="warn" (click)="exportFlakyCsv()" class="export-flaky-btn">
+              <mat-icon>download</mat-icon>
+              <span>Export Matrix CSV</span>
+            </button>
+          </div>
+
+          <div class="table-container">
+            <table mat-table [dataSource]="flakyTests" class="analytics-table">
+              
+              <ng-container matColumnDef="scenarioName">
+                <th mat-header-cell *matHeaderCellDef>Scenario Name</th>
+                <td mat-cell *matCellDef="let row">
+                  <strong class="scenario-name">{{ row.scenarioName }}</strong>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="featureFile">
+                <th mat-header-cell *matHeaderCellDef>Feature File</th>
+                <td mat-cell *matCellDef="let row">
+                  <code class="file-code">{{ row.featureFile }}</code>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="flakinessScore">
+                <th mat-header-cell *matHeaderCellDef>Instability Rate</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="unstable-chip">{{ row.flakinessScore }}%</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="runs">
+                <th mat-header-cell *matHeaderCellDef>Pass / Fail History</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="pass-count">✓ {{ row.passedRuns }}</span> / 
+                  <span class="fail-count">✗ {{ row.failedRuns }}</span> 
+                  <span class="total-runs">({{ row.totalRuns }} runs)</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="riskLevel">
+                <th mat-header-cell *matHeaderCellDef>Risk Level</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="risk-badge" [ngClass]="'risk-' + row.riskLevel.toLowerCase()">
+                    {{ row.riskLevel }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="lastFailureReason">
+                <th mat-header-cell *matHeaderCellDef>Last Error Reason</th>
+                <td mat-cell *matCellDef="let row" class="error-reason-cell">
+                  {{ row.lastFailureReason }}
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="flakyColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: flakyColumns;"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- TAB 3: ACCESSIBILITY SCORE PROGRESSION -->
+      <mat-tab>
+        <ng-template matTabLabel>
+          <div class="tab-label-flex">
+            <mat-icon>accessibility_new</mat-icon>
+            <span>Accessibility Trends</span>
+          </div>
+        </ng-template>
+
+        <div class="tab-pane">
+          <div class="pane-header">
+            <h3>WCAG 2.1 Audit Compliance Timeline</h3>
+            <p>Historical progression of accessibility scores and critical violations per audit scan</p>
+          </div>
+
+          <div class="a11y-timeline-grid" *ngIf="accessibilityTrends.length > 0; else noA11yData">
+            <div class="a11y-scan-card" *ngFor="let scan of accessibilityTrends">
+              <div class="score-badge" [ngClass]="{'high-score': scan.score >= 80, 'low-score': scan.score < 80}">
+                {{ scan.score }}
+              </div>
+              <div class="scan-details">
+                <h4>{{ scan.targetTitle }}</h4>
+                <p class="scan-url">{{ scan.url }}</p>
+                <div class="scan-meta">
+                  <span class="scan-time">Scanned: {{ scan.scanTime | date:'medium' }}</span>
+                  <span class="critical-badge" *ngIf="scan.criticalCount > 0">
+                    ⚠ {{ scan.criticalCount }} Critical Violations
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noA11yData>
+            <div class="empty-state">
+              <mat-icon class="empty-icon">accessibility_new</mat-icon>
+              <p>No historical accessibility audit runs recorded yet. Perform a scan in the Accessibility Audit Center!</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+
+      <!-- TAB 4: RAW EXECUTION HISTORY -->
+      <mat-tab>
+        <ng-template matTabLabel>
+          <div class="tab-label-flex">
+            <mat-icon>history</mat-icon>
+            <span>Execution History</span>
+          </div>
+        </ng-template>
+
+        <div class="tab-pane">
+          <div class="table-container">
+            <table mat-table [dataSource]="(reports$ | async) ?? []" class="analytics-table">
+              
+              <ng-container matColumnDef="projectName">
+                <th mat-header-cell *matHeaderCellDef>Project</th>
+                <td mat-cell *matCellDef="let row">
+                  <strong>{{ row.projectName }}</strong>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="featureName">
+                <th mat-header-cell *matHeaderCellDef>Feature</th>
+                <td mat-cell *matCellDef="let row">{{ row.featureName }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="environment">
+                <th mat-header-cell *matHeaderCellDef>Environment</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="env-chip" [ngClass]="(row.environment || 'staging').toLowerCase()">
+                    {{ row.environment }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="status-pill" [ngClass]="'status-' + (row.status || 'passed').toLowerCase()">
+                    {{ row.status }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="durationSeconds">
+                <th mat-header-cell *matHeaderCellDef>Duration</th>
+                <td mat-cell *matCellDef="let row">{{ row.durationSeconds }}s</td>
+              </ng-container>
+
+              <ng-container matColumnDef="executedAt">
+                <th mat-header-cell *matHeaderCellDef>Executed At</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.executedAt | date:'short' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let row">
+                  <button mat-button color="primary" class="detail-link" (click)="viewDetails(row)">
+                    View Details
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </mat-card>
+
+</section>

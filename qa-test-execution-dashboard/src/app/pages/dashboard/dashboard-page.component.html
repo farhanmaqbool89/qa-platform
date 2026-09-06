@@ -1,0 +1,211 @@
+<section class="dashboard-page" @fadeInUp>
+
+  <!-- TOP HERO DASHBOARD BANNER -->
+  <div class="dash-hero glass-card">
+    <div class="hero-text">
+      <h2>Overview Quality Dashboard</h2>
+      <p>Real-time BDD telemetry, execution health meters, and historical test run metrics.</p>
+    </div>
+
+    <button mat-raised-button color="primary" class="hero-launch-btn" (click)="goToLaunchCenter()">
+      <mat-icon>rocket_launch</mat-icon>
+      <span>Launch Quality Suite</span>
+    </button>
+  </div>
+
+  <!-- KPI SUMMARY & GAUGES GRID -->
+  <ng-container *ngIf="summary$ | async as summary">
+
+    <div class="summary-grid" @staggerCards>
+
+      <!-- CARD 1: TOTAL PROJECTS -->
+      <mat-card class="summary-card projects-card glass-card">
+        <mat-card-content>
+          <div class="summary-card-header">
+            <div class="summary-label">Active Workspaces</div>
+            <div class="card-icon-badge cyan">
+              <mat-icon>account_tree</mat-icon>
+            </div>
+          </div>
+          <div class="summary-value">{{ summary.totalProjects }}</div>
+          <div class="summary-subtext">Configured test suites</div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- CARD 2: PASS-RATE GAUGE -->
+      <mat-card class="summary-card gauge-card glass-card">
+        <mat-card-content>
+          <div class="summary-card-header">
+            <div class="summary-label">Quality Pass Rate</div>
+            <div class="card-icon-badge emerald">
+              <mat-icon>verified</mat-icon>
+            </div>
+          </div>
+          <div class="gauge-value-row">
+            <span class="summary-value emerald">{{ summary.passRate }}%</span>
+            <span class="gauge-badge">WCAG & BDD</span>
+          </div>
+          <div class="progress-bar-wrapper">
+            <mat-progress-bar mode="determinate" [value]="summary.passRate" aria-label="Quality Pass Rate" class="neon-progress-bar"></mat-progress-bar>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- CARD 3: PASSED RUNS -->
+      <mat-card class="summary-card pass-card glass-card">
+        <mat-card-content>
+          <div class="summary-card-header">
+            <div class="summary-label">Passed Runs</div>
+            <div class="card-icon-badge pass">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+          </div>
+          <div class="summary-value pass">
+            {{ summary.passedRuns }}
+          </div>
+          <div class="summary-subtext">Verified green BDD executions</div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- CARD 4: FAILED RUNS -->
+      <mat-card class="summary-card fail-card glass-card">
+        <mat-card-content>
+          <div class="summary-card-header">
+            <div class="summary-label">Failed Runs</div>
+            <div class="card-icon-badge fail">
+              <mat-icon>error_outline</mat-icon>
+            </div>
+          </div>
+          <div class="summary-value fail">
+            {{ summary.failedRuns }}
+          </div>
+          <div class="summary-subtext">Requires failure artifact analysis</div>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+
+    <!-- ACTIVE SUITE PROGRESS STRIP (If runs are executing) -->
+    <div class="active-suite-card glass-card" *ngIf="summary.runningRuns > 0">
+      <div class="active-suite-left">
+        <div class="live-dot-pulse"></div>
+        <div>
+          <span class="active-title">Active Suite Running</span>
+          <span class="active-sub">Processing {{ summary.runningRuns }} parallel execution worker threads...</span>
+        </div>
+      </div>
+      <mat-progress-bar mode="indeterminate" aria-label="Active suite execution progress" class="active-progress-bar"></mat-progress-bar>
+    </div>
+
+  </ng-container>
+
+  <!-- RECENT EXECUTIONS TABLE -->
+  <mat-card class="recent-card glass-card" @fadeInUp>
+
+    <mat-card-header class="table-card-header">
+      <div class="table-title-group">
+        <div class="header-icon-box">
+          <mat-icon>history_toggle_off</mat-icon>
+        </div>
+        <div>
+          <mat-card-title>Recent Test Executions</mat-card-title>
+          <mat-card-subtitle>Live telemetry history of BDD test runs</mat-card-subtitle>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+
+      <table
+        mat-table
+        [dataSource]="(recentExecutions$ | async) ?? []"
+        class="recent-table"
+      >
+
+        <!-- Project -->
+        <ng-container matColumnDef="projectName">
+          <th mat-header-cell *matHeaderCellDef>Project</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="project-name-cell">
+              <mat-icon class="inline-cell-icon">folder</mat-icon>
+              <b>{{ row.projectName }}</b>
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Feature -->
+        <ng-container matColumnDef="featureName">
+          <th mat-header-cell *matHeaderCellDef>Feature</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="feature-label-cell">{{ row.featureName }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Environment -->
+        <ng-container matColumnDef="environment">
+          <th mat-header-cell *matHeaderCellDef>Environment</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="env-badge" [ngClass]="row.environment.toLowerCase()">{{ row.environment }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="status-pill" [ngClass]="row.status.toLowerCase()">
+              <span class="status-dot"></span>
+              {{ row.status }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Duration -->
+        <ng-container matColumnDef="durationSeconds">
+          <th mat-header-cell *matHeaderCellDef>Duration</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="duration-tag">
+              <mat-icon class="mini-icon">timer</mat-icon>
+              {{ row.durationSeconds }}s
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Executed At -->
+        <ng-container matColumnDef="startedAt">
+          <th mat-header-cell *matHeaderCellDef>Executed At</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="timestamp-cell">{{ row.startedAt | date:'medium' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- HEADER -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+        <!-- CLICKABLE ROW -->
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          @tableRowAnimation
+          class="clickable-row"
+          (click)="goToExecution(row.id)"
+        ></tr>
+
+        <!-- EMPTY STATE -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell empty-state" colspan="6">
+            <div class="empty-state-box">
+              <mat-icon class="empty-icon">assignment_late</mat-icon>
+              <p>No test executions recorded yet.</p>
+              <button mat-stroked-button color="primary" (click)="goToLaunchCenter()">Launch First Test Run</button>
+            </div>
+          </td>
+        </tr>
+
+      </table>
+
+    </mat-card-content>
+
+  </mat-card>
+
+</section>

@@ -1,0 +1,333 @@
+<div class="launch-center-page">
+  
+  <!-- HERO HEADER BAR -->
+  <header class="launch-header glass-card">
+    <div class="header-left">
+      <div class="rocket-badge">
+        <mat-icon class="rocket-icon">rocket_launch</mat-icon>
+      </div>
+      <div class="header-titles">
+        <div class="title-row">
+          <h1>Unified QA Launch Center</h1>
+          <span class="pro-tag">ENTERPRISE ENGINE</span>
+        </div>
+        <p class="subtitle">Orchestrate BDD runs, multi-standard accessibility audits, and enterprise session authentication states.</p>
+      </div>
+    </div>
+
+    <div class="header-metrics">
+      <div class="metric-pill">
+        <span class="metric-dot green"></span>
+        <span class="metric-label">Socket Engine</span>
+        <span class="metric-val">Connected</span>
+      </div>
+      <div class="metric-pill">
+        <span class="metric-dot cyan"></span>
+        <span class="metric-label">Playwright</span>
+        <span class="metric-val">v1.42.0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- FORM CONTAINER -->
+  <form [formGroup]="launchForm" (ngSubmit)="launchQualitySuite()" class="launch-form">
+    
+    <div class="grid-container">
+
+      <!-- SECTION 1: TARGET WORKSPACE & SCOPE -->
+      <mat-card class="glass-card section-card">
+        <mat-card-header>
+          <div class="card-header-icon cyan">
+            <mat-icon>account_tree</mat-icon>
+          </div>
+          <div class="header-text-group">
+            <mat-card-title>Target Workspace & Scope</mat-card-title>
+            <mat-card-subtitle>Select target project, features, and execution environment</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="form-content">
+          <!-- Project -->
+          <mat-form-field appearance="outline" class="form-field-full">
+            <mat-label>Target Project Workspace</mat-label>
+            <mat-select formControlName="projectId">
+              <mat-option *ngFor="let proj of projects$ | async" [value]="proj.id">
+                <div class="select-option-row">
+                  <mat-icon class="option-icon">folder</mat-icon>
+                  <span>{{ proj.name }} ({{ proj.browser }})</span>
+                </div>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- BDD Features -->
+          <mat-form-field appearance="outline" class="form-field-full">
+            <mat-label>BDD Feature Scenarios</mat-label>
+            <mat-select formControlName="featureIds" multiple>
+              <mat-option *ngFor="let feat of featureOptions$ | async" [value]="feat.id">
+                {{ feat.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Environment & Target URL Grid -->
+          <div class="form-grid-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Environment</mat-label>
+              <mat-select formControlName="environment">
+                <mat-option *ngFor="let env of environmentOptions" [value]="env">
+                  <span class="env-chip" [ngClass]="env.toLowerCase()">{{ env }}</span>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Target Base URL</mat-label>
+              <input matInput formControlName="targetUrl" placeholder="https://qa.example.com" />
+              <mat-icon matSuffix>link</mat-icon>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- SECTION 2: BDD EXECUTION & RUNNER SETTINGS -->
+      <mat-card class="glass-card section-card">
+        <mat-card-header>
+          <div class="card-header-icon purple">
+            <mat-icon>tune</mat-icon>
+          </div>
+          <div class="header-text-group">
+            <mat-card-title>Execution Settings & BDD Tags</mat-card-title>
+            <mat-card-subtitle>Configure browser mode, retry logic, and tag filters</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="form-content">
+          <!-- Browser Mode Toggle -->
+          <div class="setting-block">
+            <label class="setting-label">Browser Execution Mode</label>
+            <mat-button-toggle-group formControlName="browserMode" aria-label="Browser Mode" class="mode-toggle-group">
+              <mat-button-toggle value="headless">
+                <div class="toggle-content">
+                  <mat-icon>speed</mat-icon>
+                  <span>Headless (Fast)</span>
+                </div>
+              </mat-button-toggle>
+              <mat-button-toggle value="interactive">
+                <div class="toggle-content">
+                  <mat-icon>open_in_new</mat-icon>
+                  <span>Interactive GUI</span>
+                </div>
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+
+          <!-- Retry Count & Parallel Workers Grid -->
+          <div class="form-grid-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Flaky Test Retries</mat-label>
+              <mat-select formControlName="retryCount">
+                <mat-option *ngFor="let retry of retryOptions" [value]="retry">
+                  {{ retry === 0 ? 'No Retries (Strict)' : retry + ' Retry Attempt' + (retry > 1 ? 's' : '') }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Parallel Workers</mat-label>
+              <input matInput type="number" formControlName="parallelWorkers" min="1" max="16" />
+              <mat-icon matSuffix>dns</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- BDD Tags Selection -->
+          <div class="setting-block">
+            <label class="setting-label">Filter BDD Tags</label>
+            <div class="tags-chips-bar">
+              <span
+                *ngFor="let tag of availableTagChips"
+                class="tag-chip"
+                [class.active]="isTagActive(tag)"
+                (click)="toggleTagChip(tag)"
+              >
+                {{ tag }}
+              </span>
+            </div>
+            <mat-form-field appearance="outline" class="form-field-full mt-2">
+              <mat-label>Tag Query Expression</mat-label>
+              <input matInput formControlName="tags" placeholder="e.g. @smoke and not @wip" />
+              <mat-icon matSuffix>local_offer</mat-icon>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- SECTION 3: ACCESSIBILITY STANDARDS SELECTION -->
+      <mat-card class="glass-card section-card full-width">
+        <mat-card-header class="header-with-toggle">
+          <div class="header-left-title">
+            <div class="card-header-icon emerald">
+              <mat-icon>accessibility_new</mat-icon>
+            </div>
+            <div class="header-text-group">
+              <mat-card-title>Accessibility & Compliance Standards</mat-card-title>
+              <mat-card-subtitle>Automated axe-core compliance scans aligned with international standards</mat-card-subtitle>
+            </div>
+          </div>
+          <mat-slide-toggle formControlName="enableAccessibilityScan" color="primary">
+            <span class="toggle-text">Enable Automated Audit</span>
+          </mat-slide-toggle>
+        </mat-card-header>
+
+        <mat-card-content class="form-content" *ngIf="launchForm.value.enableAccessibilityScan">
+          <div class="standards-grid">
+            <div
+              *ngFor="let std of accessibilityStandards"
+              class="standard-card"
+              [class.selected]="isStandardSelected(std.id)"
+              (click)="toggleStandard(std.id)"
+            >
+              <div class="std-top">
+                <span class="std-badge">{{ std.badge }}</span>
+                <mat-icon class="check-icon" *ngIf="isStandardSelected(std.id)">check_circle</mat-icon>
+              </div>
+              <div class="std-title">{{ std.label }}</div>
+              <div class="std-desc">{{ std.description }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- SECTION 4: ARTIFACTS & RECORDING OPTIONS -->
+      <mat-card class="glass-card section-card full-width">
+        <mat-card-header>
+          <div class="card-header-icon indigo">
+            <mat-icon>perm_media</mat-icon>
+          </div>
+          <div class="header-text-group">
+            <mat-card-title>Test Execution Artifacts & Recording</mat-card-title>
+            <mat-card-subtitle>Configure visual artifacts and diagnostic traces captured during test runs</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="form-content">
+          <div class="artifacts-grid">
+            <div class="artifact-card">
+              <div class="artifact-info">
+                <mat-icon class="artifact-icon amber">photo_camera</mat-icon>
+                <div>
+                  <div class="artifact-title">Screenshots</div>
+                  <div class="artifact-sub">Capture step & failure screenshots</div>
+                </div>
+              </div>
+              <mat-slide-toggle formControlName="enableScreenshots" color="primary"></mat-slide-toggle>
+            </div>
+
+            <div class="artifact-card">
+              <div class="artifact-info">
+                <mat-icon class="artifact-icon rose">videocam</mat-icon>
+                <div>
+                  <div class="artifact-title">Video Recording</div>
+                  <div class="artifact-sub">Record browser MP4 walkthrough</div>
+                </div>
+              </div>
+              <mat-slide-toggle formControlName="enableVideo" color="primary"></mat-slide-toggle>
+            </div>
+
+            <div class="artifact-card">
+              <div class="artifact-info">
+                <mat-icon class="artifact-icon cyan">schema</mat-icon>
+                <div>
+                  <div class="artifact-title">Playwright Trace</div>
+                  <div class="artifact-sub">Export diagnostic trace archive</div>
+                </div>
+              </div>
+              <mat-slide-toggle formControlName="enableTrace" color="primary"></mat-slide-toggle>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- SECTION 5: ENTERPRISE SESSION AUTHENTICATION -->
+      <mat-card class="glass-card section-card full-width">
+        <mat-card-header>
+          <div class="card-header-icon rose">
+            <mat-icon>vpn_key</mat-icon>
+          </div>
+          <div class="header-text-group">
+            <mat-card-title>Session Authentication Picker (storageState.json)</mat-card-title>
+            <mat-card-subtitle>Inject pre-authenticated storage states to bypass login flows</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="form-content">
+          <div class="session-picker-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Select Authenticated Session State</mat-label>
+              <mat-select formControlName="sessionState">
+                <mat-option value="none">
+                  <div class="select-option-row">
+                    <mat-icon class="option-icon text-muted">lock_open</mat-icon>
+                    <span>Anonymous / Fresh Session (No Auth)</span>
+                  </div>
+                </mat-option>
+                <mat-option *ngFor="let session of sessions$ | async" [value]="session.name">
+                  <div class="select-option-row">
+                    <mat-icon class="option-icon text-rose">verified_user</mat-icon>
+                    <span>{{ session.displayName }} ({{ session.name }})</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div class="session-preview-badge" *ngIf="launchForm.value.sessionState !== 'none'">
+              <mat-icon class="preview-icon">security</mat-icon>
+              <div class="preview-info">
+                <span class="preview-title">Storage State Ready</span>
+                <span class="preview-sub">Loaded from /api/sessions/{{ launchForm.value.sessionState }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+
+    <!-- ONE-CLICK LAUNCH BAR -->
+    <div class="launch-action-bar glass-card">
+      <div class="action-info">
+        <div class="summary-line">
+          <mat-icon class="info-icon">rocket</mat-icon>
+          <span>Target Environment: <b>{{ launchForm.value.environment }}</b></span>
+        </div>
+        <div class="summary-tags">
+          <span class="mini-pill">Mode: {{ launchForm.value.browserMode }}</span>
+          <span class="mini-pill">Tags: {{ launchForm.value.tags || 'All' }}</span>
+          <span class="mini-pill" *ngIf="launchForm.value.enableAccessibilityScan">
+            Accessibility: {{ selectedStandards.length }} Standards
+          </span>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        class="launch-btn"
+        [disabled]="isLaunching"
+      >
+        <ng-container *ngIf="!isLaunching">
+          <mat-icon class="btn-icon">rocket_launch</mat-icon>
+          <span>Launch Quality Suite</span>
+        </ng-container>
+
+        <ng-container *ngIf="isLaunching">
+          <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+          <span>Dispatching...</span>
+        </ng-container>
+      </button>
+    </div>
+
+  </form>
+
+</div>
