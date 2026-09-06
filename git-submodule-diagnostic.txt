@@ -1,0 +1,5 @@
+type .gitmodules
+
+git submodule status
+
+git ls-files --stage qa-backend
