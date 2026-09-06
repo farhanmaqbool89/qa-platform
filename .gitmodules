@@ -1,0 +1,3 @@
+[submodule "qa-backend"]
+    path = qa-backend
+    url = https://gitlab.expertflow.com/qa-execution/qa-backend
