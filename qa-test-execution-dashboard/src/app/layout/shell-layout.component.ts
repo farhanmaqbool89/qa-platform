@@ -233,6 +233,6 @@ export class ShellLayoutComponent implements OnInit {
     else if (url.includes('/features')) this.activePageTitle = 'BDD Feature Management';
     else if (url.includes('/reports')) this.activePageTitle = 'Advanced Analytics & Reports';
     else if (url.includes('/cicd')) this.activePageTitle = 'CI/CD Pipeline Hub';
-    else this.activePageTitle = 'Qevixa Dashboard';
+    else this.activePageTitle = 'Krodux Dashboard';
   }
 }
