@@ -1,3 +1,0 @@
-# Git submodules have been removed.
-# The qa-test-execution-dashboard Angular frontend is now tracked directly in this repository.
-# The qa-backend is not required for Cloudflare Pages frontend deployment.
