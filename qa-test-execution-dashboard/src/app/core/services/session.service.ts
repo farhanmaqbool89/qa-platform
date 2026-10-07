@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
@@ -15,7 +16,7 @@ export interface SessionState {
   providedIn: 'root'
 })
 export class SessionService {
-  private readonly apiUrl = 'http://localhost:3000/api/sessions';
+  private readonly apiUrl = `${environment.apiUrl}/api/sessions`;
 
   private readonly defaultSessions: SessionState[] = [
     { name: 'admin-storageState.json', displayName: 'Enterprise Admin State (admin@company.com)', role: 'Administrator' },

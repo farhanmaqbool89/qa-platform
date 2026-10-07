@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, tap, catchError, map } from 'rxjs';
@@ -8,7 +9,7 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class PlatformAuthService {
-  private readonly baseUrl = 'http://localhost:3000/api/auth';
+  private readonly baseUrl = `${environment.apiUrl}/api/auth`;
   private currentUserSubject = new BehaviorSubject<PlatformUser | null>(this.getStoredUser());
   public currentUser$ = this.currentUserSubject.asObservable();
 

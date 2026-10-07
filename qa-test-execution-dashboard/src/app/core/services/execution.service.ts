@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
@@ -75,7 +76,7 @@ export class ExecutionService {
 
   private initSocketConnection(): void {
 
-    this.socket = io('http://localhost:3000');
+    this.socket = io(environment.wsUrl);
 
     this.socket.on('connect', () => {
       console.log('Socket connected:', this.socket.id);
@@ -218,7 +219,7 @@ export class ExecutionService {
   private addArtifactToExecution(executionId: number, type: 'screenshot' | 'video' | 'trace', url: string): void {
     const existing = this.artifactsMap.get(executionId) || { screenshots: [], videos: [], traces: [], accessibility: null };
 
-    const fullUrl = url.startsWith('http') ? url : `http://localhost:3000${url}`;
+    const fullUrl = url.startsWith('http') ? url : `${environment.apiUrl}${url}`;
 
     if (type === 'screenshot' && !existing.screenshots.includes(fullUrl)) {
       existing.screenshots.push(fullUrl);
@@ -238,7 +239,7 @@ export class ExecutionService {
       ...existing,
       accessibility: {
         ...summary,
-        reportUrl: summary.reportUrl ? `http://localhost:3000${summary.reportUrl}` : undefined
+        reportUrl: summary.reportUrl ? `${environment.apiUrl}${summary.reportUrl}` : undefined
       }
     };
 

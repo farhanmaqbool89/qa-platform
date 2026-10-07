@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -185,7 +186,7 @@ export class AccessibilityPageComponent implements OnInit, OnDestroy {
   }
 
   private initSocket(): void {
-    this.socket = io('http://localhost:3000');
+    this.socket = io(environment.wsUrl);
 
     this.socket.on('connect', () => {
       console.log('Connected to backend socket for accessibility:', this.socket.id);
@@ -265,7 +266,7 @@ export class AccessibilityPageComponent implements OnInit, OnDestroy {
   }
 
   loadSavedReports(): void {
-    this.http.get<{ success: boolean; reports: SavedReportSummary[] }>('http://localhost:3000/api/accessibility/reports')
+    this.http.get<{ success: boolean; reports: SavedReportSummary[] }>(`${environment.apiUrl}/api/accessibility/reports`)
       .subscribe({
         next: (res) => {
           if (res.success && res.reports) {
@@ -278,7 +279,7 @@ export class AccessibilityPageComponent implements OnInit, OnDestroy {
   }
 
   viewSavedReport(scanId: string): void {
-    this.http.get<{ success: boolean; report: DirectAccessibilityReport }>(`http://localhost:3000/api/accessibility/reports/${scanId}`)
+    this.http.get<{ success: boolean; report: DirectAccessibilityReport }>(`${environment.apiUrl}/api/accessibility/reports/${scanId}`)
       .subscribe({
         next: (res) => {
           if (res.success && res.report) {

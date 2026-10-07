@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -136,7 +137,7 @@ export class ExecutionDetailComponent implements OnInit, OnDestroy, AfterViewChe
 
   loadUnifiedArtifacts(): void {
     this.http.get<{ success: boolean; artifacts: ArtifactsResponse }>(
-      `http://localhost:3000/api/executions/${this.executionIdStr}/artifacts`
+      `${environment.apiUrl}/api/executions/${this.executionIdStr}/artifacts`
     ).subscribe({
       next: (res) => {
         if (res.success && res.artifacts) {
@@ -156,7 +157,7 @@ export class ExecutionDetailComponent implements OnInit, OnDestroy, AfterViewChe
 
   cancelExecution(): void {
     this.isCancelling = true;
-    this.http.post(`http://localhost:3000/api/executions/${this.executionIdStr}/cancel`, {})
+    this.http.post(`${environment.apiUrl}/api/executions/${this.executionIdStr}/cancel`, {})
       .subscribe({
         next: () => {
           this.isCancelling = false;

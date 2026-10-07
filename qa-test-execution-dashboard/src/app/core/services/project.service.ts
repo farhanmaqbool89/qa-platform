@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
@@ -9,7 +10,7 @@ type ProjectDraft = Omit<Project, 'id'>;
   providedIn: 'root'
 })
 export class ProjectService {
-  private readonly baseUrl = 'http://localhost:3000/api/projects';
+  private readonly baseUrl = `${environment.apiUrl}/api/projects`;
   private readonly projectsSubject = new BehaviorSubject<Project[]>([]);
   readonly projects$ = this.projectsSubject.asObservable();
 

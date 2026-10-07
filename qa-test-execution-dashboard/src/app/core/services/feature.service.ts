@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
@@ -14,7 +15,7 @@ export interface FeatureDraft {
   providedIn: 'root'
 })
 export class FeatureService {
-  private readonly baseUrl = 'http://localhost:3000/api/features';
+  private readonly baseUrl = `${environment.apiUrl}/api/features`;
   private readonly featuresSubject = new BehaviorSubject<FeatureFile[]>([]);
   readonly features$ = this.featuresSubject.asObservable();
 

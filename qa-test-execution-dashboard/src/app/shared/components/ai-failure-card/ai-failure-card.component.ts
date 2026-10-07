@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -99,7 +100,7 @@ export class AiFailureCardComponent implements OnInit {
 
     if (!force) {
       this.http.get<{ success: boolean; analysis: FailureAnalysisReport }>(
-        `http://localhost:3000/api/executions/${this.executionId}/analysis`
+        `${environment.apiUrl}/api/executions/${this.executionId}/analysis`
       ).subscribe({
         next: (res) => {
           if (res.success && res.analysis) {
@@ -117,7 +118,7 @@ export class AiFailureCardComponent implements OnInit {
   }
 
   private requestFreshAnalysis(force = false): void {
-    const url = `http://localhost:3000/api/executions/${this.executionId}/analyze${force ? '?force=true' : ''}`;
+    const url = `${environment.apiUrl}/api/executions/${this.executionId}/analyze${force ? '?force=true' : ''}`;
     this.http.post<{ success: boolean; analysis: FailureAnalysisReport }>(url, {
       logs: this.failureLogs,
       failureReason: this.failureReason

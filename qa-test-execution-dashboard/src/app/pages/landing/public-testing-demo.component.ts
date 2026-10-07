@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -28,7 +29,7 @@ export class PublicTestingDemoComponent {
     this.aiResult = null;
     this.errorMessage = '';
 
-    this.http.post<any>('http://localhost:3000/api/public/ai-demo', { requirementText: this.requirementText }).subscribe({
+    this.http.post<any>(`${environment.apiUrl}/api/public/ai-demo`, { requirementText: this.requirementText }).subscribe({
       next: (res) => {
         this.isGenerating = false;
         if (res.success) {

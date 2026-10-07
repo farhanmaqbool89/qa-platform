@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -85,7 +86,7 @@ export class PublicWcagDemoComponent {
     this.scanResult = null;
     this.errorMessage = '';
 
-    this.http.post<any>('http://localhost:3000/api/public/wcag-scan', { url: this.targetUrl }).subscribe({
+    this.http.post<any>(`${environment.apiUrl}/api/public/wcag-scan`, { url: this.targetUrl }).subscribe({
       next: (res) => {
         this.isScanning = false;
         if (res.success && res.report) {

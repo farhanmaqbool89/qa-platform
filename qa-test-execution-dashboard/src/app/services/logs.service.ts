@@ -1,3 +1,4 @@
+import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { io } from 'socket.io-client';
 import { BehaviorSubject } from 'rxjs';
@@ -10,7 +11,7 @@ export interface LogEntry {
 @Injectable({ providedIn: 'root' })
 export class LogsService {
 
-  private socket = io('http://localhost:3000');
+  private socket = io(environment.wsUrl);
 
   private logsSubject = new BehaviorSubject<LogEntry[]>([]);
   logs$ = this.logsSubject.asObservable();

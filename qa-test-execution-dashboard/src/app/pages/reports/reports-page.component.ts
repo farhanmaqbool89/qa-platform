@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -131,7 +132,7 @@ export class ReportsPageComponent implements OnInit {
     this.isLoadingAnalytics = true;
 
     // Fetch analytics endpoints in parallel
-    this.http.get<{ success: boolean; summary: SummaryMetrics }>('http://localhost:3000/api/reports/summary')
+    this.http.get<{ success: boolean; summary: SummaryMetrics }>(`${environment.apiUrl}/api/reports/summary`)
       .subscribe({
         next: (res) => { if (res.success) this.summary = res.summary; },
         error: () => {
@@ -153,19 +154,19 @@ export class ReportsPageComponent implements OnInit {
         }
       });
 
-    this.http.get<{ success: boolean; trends: ExecutionTrendDay[] }>('http://localhost:3000/api/reports/trends')
+    this.http.get<{ success: boolean; trends: ExecutionTrendDay[] }>(`${environment.apiUrl}/api/reports/trends`)
       .subscribe({
         next: (res) => { if (res.success) this.trends = res.trends; },
         error: () => {}
       });
 
-    this.http.get<{ success: boolean; flakyTests: FlakyTestItem[] }>('http://localhost:3000/api/reports/flaky')
+    this.http.get<{ success: boolean; flakyTests: FlakyTestItem[] }>(`${environment.apiUrl}/api/reports/flaky`)
       .subscribe({
         next: (res) => { if (res.success) this.flakyTests = res.flakyTests; },
         error: () => {}
       });
 
-    this.http.get<{ success: boolean; reports: AccessibilityTrendItem[] }>('http://localhost:3000/api/reports/accessibility-trends')
+    this.http.get<{ success: boolean; reports: AccessibilityTrendItem[] }>(`${environment.apiUrl}/api/reports/accessibility-trends`)
       .subscribe({
         next: (res) => {
           if (res.success) this.accessibilityTrends = res.reports;

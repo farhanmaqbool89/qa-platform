@@ -1,3 +1,4 @@
+import { environment } from '../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -123,7 +124,7 @@ export class ShellLayoutComponent implements OnInit {
     if (!this.targetUrl) return;
     this.isScanning = true;
 
-    this.http.post('http://localhost:3000/api/accessibility/live-scan', {
+    this.http.post(`${environment.apiUrl}/api/accessibility/live-scan`, {
       url: this.targetUrl,
       standard: 'wcag21aa',
       browserMode: 'interactive'
@@ -151,7 +152,7 @@ export class ShellLayoutComponent implements OnInit {
   keepBrowserOpen = true;
 
   checkSessionStatus(): void {
-    this.http.get<any>(`http://localhost:3000/api/sessions/status?projectId=${this.activeProject}&environment=${this.activeEnvironment}`)
+    this.http.get<any>(`${environment.apiUrl}/api/sessions/status?projectId=${this.activeProject}&environment=${this.activeEnvironment}`)
       .subscribe({
         next: (res) => {
           this.hasActiveSession = !!res?.hasSavedSession;
@@ -163,7 +164,7 @@ export class ShellLayoutComponent implements OnInit {
   }
 
   recordSession(): void {
-    this.http.post<any>('http://localhost:3000/api/sessions/login', {
+    this.http.post<any>(`${environment.apiUrl}/api/sessions/login`, {
       url: this.targetUrl,
       projectId: this.activeProject,
       environment: this.activeEnvironment
@@ -177,7 +178,7 @@ export class ShellLayoutComponent implements OnInit {
   }
 
   clearActiveSession(): void {
-    this.http.delete<any>(`http://localhost:3000/api/sessions?projectId=${this.activeProject}&environment=${this.activeEnvironment}`)
+    this.http.delete<any>(`${environment.apiUrl}/api/sessions?projectId=${this.activeProject}&environment=${this.activeEnvironment}`)
       .subscribe({
         next: () => {
           this.hasActiveSession = false;
@@ -206,7 +207,7 @@ export class ShellLayoutComponent implements OnInit {
 
   private initSocket(): void {
     try {
-      this.socket = io('http://localhost:3000', { reconnection: true, reconnectionDelay: 2000, timeout: 3000 });
+      this.socket = io(environment.wsUrl, { reconnection: true, reconnectionDelay: 2000, timeout: 3000 });
       this.socket.on('connect', () => {
         this.isEngineOnline = true;
         this.latencyMs = 12;

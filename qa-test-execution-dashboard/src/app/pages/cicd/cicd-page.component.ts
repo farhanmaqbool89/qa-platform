@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -111,7 +112,7 @@ export class CicdPageComponent implements OnInit {
 
   loadWebhookHistory(): void {
     this.isLoadingHistory = true;
-    this.http.get<{ success: boolean; history: WebhookTelemetryItem[] }>('http://localhost:3000/api/webhooks/history')
+    this.http.get<{ success: boolean; history: WebhookTelemetryItem[] }>(`${environment.apiUrl}/api/webhooks/history`)
       .subscribe({
         next: (res) => {
           if (res.success) {
@@ -127,7 +128,7 @@ export class CicdPageComponent implements OnInit {
   }
 
   loadApiKeys(): void {
-    this.http.get<{ success: boolean; activeKeys: ApiKeyItem[] }>('http://localhost:3000/api/v1/auth/keys')
+    this.http.get<{ success: boolean; activeKeys: ApiKeyItem[] }>(`${environment.apiUrl}/api/v1/auth/keys`)
       .subscribe({
         next: (res) => {
           if (res.success) this.activeApiKeys = res.activeKeys;
@@ -141,7 +142,7 @@ export class CicdPageComponent implements OnInit {
   }
 
   generateNewApiKey(): void {
-    this.http.post<{ success: boolean; apiKey: string }>('http://localhost:3000/api/v1/auth/keys', {})
+    this.http.post<{ success: boolean; apiKey: string }>(`${environment.apiUrl}/api/v1/auth/keys`, {})
       .subscribe({
         next: () => this.loadApiKeys(),
         error: () => {}
@@ -208,8 +209,8 @@ export class CicdPageComponent implements OnInit {
     this.isTriggering = true;
 
     const endpoint = val.triggerType === 'TEST_EXECUTION'
-      ? 'http://localhost:3000/api/webhooks/trigger-test'
-      : 'http://localhost:3000/api/webhooks/trigger-scan';
+      ? `${environment.apiUrl}/api/webhooks/trigger-test`
+      : `${environment.apiUrl}/api/webhooks/trigger-scan`;
 
     const body = val.triggerType === 'TEST_EXECUTION'
       ? {
@@ -243,7 +244,7 @@ export class CicdPageComponent implements OnInit {
 
   sendTestNotificationAlert(): void {
     this.isSendingAlert = true;
-    this.http.post('http://localhost:3000/api/v1/notifications/test-alert', {}).subscribe({
+    this.http.post(`${environment.apiUrl}/api/v1/notifications/test-alert`, {}).subscribe({
       next: () => {
         this.isSendingAlert = false;
         this.copyStatusMessage = 'Slack / Teams Test Alert Sent!';
