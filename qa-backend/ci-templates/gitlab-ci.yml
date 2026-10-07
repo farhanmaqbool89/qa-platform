@@ -1,0 +1,21 @@
+image: mcr.microsoft.com/playwright:v1.38.0-focal
+
+stages:
+  - test
+  - notify
+
+run_bdd_tests:
+  stage: test
+  script:
+    - npm ci
+    - npx cucumber-js
+  artifacts:
+    when: always
+    paths:
+      - artifacts/
+    expire_in: 1 week
+
+trigger_dashboard_webhook:
+  stage: notify
+  script:
+    - curl -X POST "http://dashboard.internal/api/webhooks/trigger-test" -H "Content-Type: application/json" -d '{"feature":"all","environment":"gitlab-ci"}'

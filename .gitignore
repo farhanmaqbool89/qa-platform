@@ -28,5 +28,3 @@ Thumbs.db
 *.swo
 *~
 
-# Backend submodule — not needed for Cloudflare Pages frontend deployment
-qa-backend/

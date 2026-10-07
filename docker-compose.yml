@@ -1,0 +1,67 @@
+﻿services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: krodux-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: 
+      POSTGRES_PASSWORD: 
+      POSTGRES_DB: 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U  -d "]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: krodux-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./qa-backend
+      dockerfile: Dockerfile
+    container_name: krodux-backend
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://:@postgres:5432/
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: 
+      JWT_REFRESH_SECRET: 
+      CORS_ORIGIN: https://krodux.com
+    volumes:
+      - backend_artifacts:/app/artifacts
+      - backend_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: krodux-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token 
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+  backend_artifacts:
+  backend_data:

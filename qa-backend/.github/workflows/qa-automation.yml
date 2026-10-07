@@ -1,0 +1,66 @@
+name: QA Automation & Accessibility CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Target Application URL for WCAG Audit'
+        required: false
+        default: 'https://staging.app.internal'
+
+jobs:
+  qa_execution:
+    name: Run BDD Playwright Tests & Accessibility Scans
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Project Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Execute Cucumber BDD Test Suite
+        run: npm test
+
+      - name: Trigger Remote QA Dashboard Webhook
+        if: always()
+        run: |
+          curl -X POST http://localhost:3000/api/webhooks/trigger-test \
+            -H "Content-Type: application/json" \
+            -d '{
+              "feature": "features/login.feature",
+              "tags": "@smoke",
+              "environment": "ci-runner"
+            }'
+
+      - name: Trigger Headless WCAG Accessibility Audit
+        if: always()
+        run: |
+          curl -X POST http://localhost:3000/api/webhooks/trigger-scan \
+            -H "Content-Type: application/json" \
+            -d '{
+              "url": "https://staging.app.internal",
+              "standard": "WCAG2AA"
+            }'
+
+      - name: Archive Test Run Artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-execution-artifacts
+          path: artifacts/
+          retention-days: 14

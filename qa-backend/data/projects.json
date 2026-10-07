@@ -1,0 +1,320 @@
+[
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787479759753_559",
+    "id": 101
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787479759661_199",
+    "id": 102
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787479792261_32",
+    "id": 103
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787479792168_147",
+    "id": 104
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787479831134_707",
+    "id": 105
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787479831041_458",
+    "id": 106
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787480086267_334",
+    "id": 107
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787480086177_92",
+    "id": 108
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787480244412_426",
+    "id": 109
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787480244267_710",
+    "id": 110
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787480481039_264",
+    "id": 111
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787480480888_791",
+    "id": 112
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787480618512_229",
+    "id": 113
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787480618370_747",
+    "id": 114
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787480753689_871",
+    "id": 115
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787480753529_7",
+    "id": 116
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787481310417_464",
+    "id": 117
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787481310242_66",
+    "id": 118
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787482564924_876",
+    "id": 119
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787482564420_680",
+    "id": 120
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787483654502_801",
+    "id": 121
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787483654344_854",
+    "id": 122
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787483761214_587",
+    "id": 123
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787483789971_76",
+    "id": 124
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787484033813_195",
+    "id": 125
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787484053890_406",
+    "id": 126
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787484060092_80",
+    "id": 127
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787484059946_913",
+    "id": 128
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787484315777_192",
+    "id": 129
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787484322071_672",
+    "id": 130
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787484321908_488",
+    "id": 131
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787484488214_744",
+    "id": 132
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787484494549_395",
+    "id": 133
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787484494343_127",
+    "id": 134
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787484942039_357",
+    "id": 135
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787484948464_393",
+    "id": 136
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787484948313_76",
+    "id": 137
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787485678040_266",
+    "id": 138
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787485684383_854",
+    "id": 139
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787485684190_894",
+    "id": 140
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787486099931_102",
+    "id": 141
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787486106346_960",
+    "id": 142
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787486106178_312",
+    "id": 143
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787487168557_40",
+    "id": 144
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787487177539_413",
+    "id": 145
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787487177104_998",
+    "id": 146
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787487248771_221",
+    "id": 147
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787487257823_764",
+    "id": 148
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787487257360_80",
+    "id": 149
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787604435375_523",
+    "id": 150
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787604443275_401",
+    "id": 151
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787604443067_674",
+    "id": 152
+  },
+  {
+    "name": "E-Commerce Storefront",
+    "description": "Main shopping cart & checkout application",
+    "organizationId": "org_1787745608870_299",
+    "id": 153
+  },
+  {
+    "name": "Secret Beta Core Service",
+    "baseUrl": "https://beta.internal.local",
+    "organizationId": "org_1787745617006_748",
+    "id": 154
+  },
+  {
+    "name": "Injected Fake Project",
+    "organizationId": "org_1787745616774_325",
+    "id": 155
+  },
+  {
+    "name": "cineza",
+    "baseUrl": "https://cineza.net",
+    "browser": "Chrome",
+    "username": "user",
+    "password": "123",
+    "organizationId": "org_1787745794811_228",
+    "id": 156
+  }
+]

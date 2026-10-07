@@ -1,0 +1,410 @@
+// Prisma Schema Definition for AI QA Automation Platform
+// Target Database: PostgreSQL
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Organization {
+  id                   String                @id @default(cuid())
+  name                 String
+  slug                 String                @unique
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  users                User[]
+  members              OrganizationMember[]
+  projects             Project[]
+  apiKeys              ApiKey[]
+  integrations         Integration[]
+  notifications        Notification[]
+  auditLogs            AuditLog[]
+  usageRecords         UsageRecord[]
+  subscriptions        Subscription[]
+  featureFiles         FeatureFile[]
+  requirements         Requirement[]
+  testCases            TestCase[]
+  testSuites           TestSuite[]
+  testPlans            TestPlan[]
+  testExecutions       TestExecution[]
+  testExecutionResults TestExecutionResult[]
+  defects              Defect[]
+  environments         Environment[]
+  releases             Release[]
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String       @default("ORG_ADMIN") // SUPER_ADMIN, ORG_ADMIN, QA_LEAD, QA_ENGINEER, DEVELOPER, VIEWER
+  status         String       @default("ACTIVE")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
+model User {
+  id                     String               @id @default(cuid())
+  organizationId         String
+  organization           Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email                  String               @unique
+  name                   String?
+  passwordHash           String?
+  role                   String               @default("ORG_ADMIN") // SUPER_ADMIN, ORG_ADMIN, QA_LEAD, QA_ENGINEER, DEVELOPER, VIEWER
+  avatarUrl              String?
+  status                 String               @default("ACTIVE") // ACTIVE, INACTIVE, UNVERIFIED
+  isEmailVerified        Boolean              @default(false)
+  emailVerificationToken String?
+  resetPasswordToken     String?
+  resetPasswordExpires   DateTime?
+  refreshToken           String?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  orgMemberships         OrganizationMember[]
+  projectMemberships     ProjectMember[]
+  auditLogs              AuditLog[]
+
+  @@index([organizationId])
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String   @default("QA_ENGINEER")
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+model Project {
+  id             String          @id @default(cuid())
+  legacyId       Int?            // For backward compatibility with legacy numeric IDs
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  baseUrl        String?
+  browser        String?         @default("Chrome")
+  username       String?
+  password       String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  members        ProjectMember[]
+  environments   Environment[]
+  featureFiles   FeatureFile[]
+  requirements   Requirement[]
+  testCases      TestCase[]
+  testSuites     TestSuite[]
+  testPlans      TestPlan[]
+  testExecutions TestExecution[]
+  releases       Release[]
+
+  @@index([organizationId])
+  @@index([organizationId, name])
+}
+
+model Environment {
+  id             String          @id @default(cuid())
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name           String          // e.g. QA, Staging, Production
+  baseUrl        String
+  variables      String?         // JSON stringified variables
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  testExecutions TestExecution[]
+
+  @@index([organizationId])
+  @@index([projectId])
+}
+
+model FeatureFile {
+  id             String       @id @default(cuid())
+  legacyId       Int?         // For backward compatibility
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name           String       // e.g. login.feature
+  content        String       // Raw Gherkin content
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  testCases      TestCase[]
+
+  @@index([organizationId])
+  @@index([projectId])
+  @@index([projectId, name])
+}
+
+model Requirement {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  externalKey    String?      // e.g. JIRA-101
+  status         String       @default("OPEN")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  testCases      TestCase[]
+
+  @@index([organizationId])
+  @@index([projectId])
+}
+
+model TestCase {
+  id               String                @id @default(cuid())
+  organizationId   String
+  organization     Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId        String
+  project          Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  featureFileId    String?
+  featureFile      FeatureFile?          @relation(fields: [featureFileId], references: [id], onDelete: SetNull)
+  requirementId    String?
+  requirement      Requirement?          @relation(fields: [requirementId], references: [id], onDelete: SetNull)
+  title            String
+  description      String?
+  steps            String?               // JSON stringified steps
+  expectedResult   String?
+  priority         String                @default("MEDIUM")
+  severity         String                @default("NORMAL")
+  automationStatus String                @default("AUTOMATED")
+  testType         String                @default("FUNCTIONAL")
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  testSuites       TestSuite[]
+  executionResults TestExecutionResult[]
+
+  @@index([organizationId])
+  @@index([projectId])
+}
+
+model TestSuite {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  tags           String?      // Dynamic BDD tags e.g. @smoke
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  testCases      TestCase[]
+  testPlans      TestPlan[]
+
+  @@index([organizationId])
+  @@index([projectId])
+}
+
+model TestPlan {
+  id             String          @id @default(cuid())
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  status         String          @default("PLANNED")
+  startDate      DateTime?
+  endDate        DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  testSuites     TestSuite[]
+  testExecutions TestExecution[]
+
+  @@index([organizationId])
+  @@index([projectId])
+}
+
+model TestExecution {
+  id             String                @id @default(cuid())
+  organizationId String
+  organization   Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  environmentId  String?
+  environment    Environment?          @relation(fields: [environmentId], references: [id], onDelete: SetNull)
+  testPlanId     String?
+  testPlan       TestPlan?             @relation(fields: [testPlanId], references: [id], onDelete: SetNull)
+  triggerSource  String                @default("MANUAL")
+  featureName    String?
+  tags           String?
+  browser        String                @default("Chromium")
+  browserMode    String                @default("headless")
+  status         String                @default("QUEUED")
+  durationMs     Int                   @default(0)
+  errorMessage   String?
+  commitSha      String?
+  branch         String?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  results        TestExecutionResult[]
+
+  @@index([organizationId])
+  @@index([projectId])
+  @@index([organizationId, status])
+}
+
+model TestExecutionResult {
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  executionId    String
+  execution      TestExecution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  testCaseId     String?
+  testCase       TestCase?     @relation(fields: [testCaseId], references: [id], onDelete: SetNull)
+  scenarioName   String
+  status         String
+  durationMs     Int           @default(0)
+  errorMessage   String?
+  stackTrace     String?
+  screenshotUrl  String?
+  videoUrl       String?
+  traceUrl       String?
+  createdAt      DateTime      @default(now())
+  defects        Defect[]
+
+  @@index([organizationId])
+  @@index([executionId])
+}
+
+model Defect {
+  id                    String               @id @default(cuid())
+  organizationId        String
+  organization          Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  testExecutionResultId String?
+  testExecutionResult   TestExecutionResult? @relation(fields: [testExecutionResultId], references: [id], onDelete: SetNull)
+  title                 String
+  description           String?
+  severity              String               @default("HIGH")
+  priority              String               @default("P1")
+  status                String               @default("OPEN")
+  jiraIssueKey          String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@index([organizationId])
+}
+
+model ApiKey {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  key            String       @unique
+  status         String       @default("ACTIVE")
+  lastUsedAt     DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([key])
+}
+
+model Integration {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  provider       String       // GITHUB, JIRA, SLACK, TEAMS
+  config         String
+  enabled        Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+}
+
+model Notification {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  channel        String
+  target         String
+  event          String
+  payload        String
+  status         String       @default("SENT")
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId])
+}
+
+model AuditLog {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action         String
+  entity         String
+  entityId       String?
+  details        String?
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId])
+  @@index([organizationId, createdAt])
+}
+
+model UsageRecord {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  metric         String
+  quantity       Int          @default(0)
+  recordedAt     DateTime     @default(now())
+
+  @@index([organizationId])
+  @@index([organizationId, metric])
+}
+
+model Subscription {
+  id                   String       @id @default(cuid())
+  organizationId       String       @unique
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan                 String       @default("STARTER") // STARTER, PRO, ENTERPRISE
+  status               String       @default("TRIALING") // TRIALING, ACTIVE, PAST_DUE, CANCELED, UNPAID
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  trialEndsAt          DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean      @default(false)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+}
+
+model Release {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  version        String       // e.g. v2.1.0
+  name           String       // e.g. Q3 Sprint Release
+  description    String?
+  status         String       @default("PLANNED") // PLANNED, IN_PROGRESS, RELEASED, ARCHIVED
+  releaseDate    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([projectId])
+}
