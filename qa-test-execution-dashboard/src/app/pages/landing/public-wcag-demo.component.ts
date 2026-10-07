@@ -72,7 +72,7 @@ export interface PublicWcagReport {
   styleUrl: './public-wcag-demo.component.scss'
 })
 export class PublicWcagDemoComponent {
-  targetUrl = 'https://expertflow.com';
+  targetUrl = '';
   isScanning = false;
   scanResult: PublicWcagReport | null = null;
   errorMessage = '';

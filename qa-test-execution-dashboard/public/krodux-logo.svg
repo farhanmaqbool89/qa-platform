@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 56" width="260" height="56" fill="none">
+  <defs>
+    <linearGradient id="kl-stem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="kl-up" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+    <linearGradient id="kl-down" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="45%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+    <linearGradient id="kl-text" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+    <linearGradient id="kl-sub" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+  </defs>
+
+  <!-- Modern Nexus K Mark -->
+  <g transform="translate(6, 4) scale(0.85)">
+    <rect x="6" y="4" width="10" height="48" rx="5" fill="url(#kl-stem)" />
+    <path d="M 23 27 L 42 8 C 43.6 6.4 46.5 7.5 46.5 9.8 L 46.5 13.8 C 46.5 15.2 45.7 16.5 44.5 17.2 L 31 28 Z" fill="url(#kl-up)" />
+    <path d="M 23 29 L 44.5 47.8 C 45.7 48.7 46.5 50 46.5 51.5 L 46.5 53.5 C 46.5 56 43.6 57.2 42 55.5 L 20 37.5 C 18.8 36.2 18.8 34.2 20 33 Z" fill="url(#kl-down)" />
+  </g>
+
+  <!-- Modern Bold Typography: KRODUX -->
+  <text x="64" y="34" 
+        font-family="'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif" 
+        font-size="25" 
+        font-weight="900" 
+        letter-spacing="3" 
+        fill="url(#kl-text)">KRODUX</text>
+
+  <!-- Tagline: QA AUTOMATION -->
+  <text x="65" y="47" 
+        font-family="'Space Grotesk', 'JetBrains Mono', system-ui, sans-serif" 
+        font-size="8.5" 
+        font-weight="700" 
+        letter-spacing="2.5" 
+        fill="url(#kl-sub)">QA AUTOMATION &amp; ACCESSIBILITY</text>
+</svg>

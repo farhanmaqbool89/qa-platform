@@ -2,44 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Krodux | QA Test Automation & Accessibility Platform</title>
+  <title>KRODUX | Enterprise AI Quality Engineering &amp; Test Automation Platform</title>
   <base href="/">
   
   <!-- Viewport & Mobile Optimization -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="theme-color" content="#005cbb">
+  <meta name="theme-color" content="#0b1329">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Krodux">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KRODUX">
   
   <!-- Primary SEO Meta Tags -->
-  <meta name="description" content="Krodux - Unified QA test automation platform for BDD scenario executions, longitudinal reporting analytics, and WCAG 2.1 accessibility compliance audits.">
-  <meta name="keywords" content="Krodux, QA automation, BDD testing, Playwright execution, WCAG accessibility audit, test execution dashboard, quality assurance, end-to-end testing">
-  <meta name="robots" content="index, follow">
-  <meta name="author" content="Krodux Engineering Team">
+  <meta name="description" content="KRODUX is an enterprise AI Quality Engineering platform delivering automated BDD test execution, dynamic DOM self-healing, real-time CI/CD telemetry, and WCAG 2.1 AA accessibility audits.">
+  <meta name="keywords" content="KRODUX, QA automation, AI test generation, BDD testing, Playwright execution, WCAG accessibility audit, automated locator healing, quality engineering, test execution dashboard">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="author" content="KRODUX Engineering Team">
   <link rel="canonical" href="http://localhost:4200/">
+
+  <!-- Favicon & Touch Icons -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <meta name="msapplication-TileImage" content="apple-touch-icon.png">
+  <meta name="msapplication-TileColor" content="#0b1329">
 
   <!-- Open Graph / Facebook SEO -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="http://localhost:4200/">
-  <meta property="og:title" content="Krodux | QA Test Automation & Accessibility Platform">
-  <meta property="og:description" content="Orchestrate BDD test executions, real-time telemetry, and WCAG accessibility compliance audits with Krodux.">
-  <meta property="og:site_name" content="Krodux QA Platform">
+  <meta property="og:title" content="KRODUX | Enterprise AI Quality Engineering &amp; Test Automation Platform">
+  <meta property="og:description" content="Orchestrate BDD test executions, real-time telemetry, AI self-healing locators, and WCAG 2.1 accessibility compliance audits with KRODUX.">
+  <meta property="og:image" content="http://localhost:4200/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="KRODUX Enterprise AI Quality Engineering Platform">
+  <meta property="og:site_name" content="KRODUX QA Platform">
   <meta property="og:locale" content="en_US">
 
-  <!-- Twitter SEO -->
+  <!-- Twitter Card SEO -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Krodux | QA Test Automation & Accessibility Platform">
-  <meta name="twitter:description" content="Orchestrate BDD test executions, real-time telemetry, and WCAG accessibility compliance audits with Krodux.">
+  <meta name="twitter:title" content="KRODUX | Enterprise AI Quality Engineering &amp; Test Automation Platform">
+  <meta name="twitter:description" content="Orchestrate BDD test executions, real-time telemetry, AI self-healing locators, and WCAG 2.1 accessibility compliance audits with KRODUX.">
+  <meta name="twitter:image" content="http://localhost:4200/og-image.png">
+  <meta name="twitter:image:alt" content="KRODUX Platform Social Card">
 
-  <!-- Favicon & Icons -->
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="apple-touch-icon" href="favicon.ico">
+  <!-- Schema.org JSON-LD Structured Data for Enhanced Search Snippets -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "http://localhost:4200/#organization",
+        "name": "KRODUX",
+        "url": "http://localhost:4200/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "http://localhost:4200/krodux-icon.svg",
+          "width": 64,
+          "height": 64
+        },
+        "description": "Enterprise AI Quality Engineering and Test Automation Orchestration Platform"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "http://localhost:4200/#software",
+        "name": "KRODUX",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web, Cloud, Node.js, Linux, Windows, macOS",
+        "description": "Unified Quality Engineering platform featuring automated BDD test execution, Playwright cross-browser runs, self-healing locators, and WCAG 2.1 AA accessibility auditing.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    ]
+  }
+  </script>
 
   <!-- Web Fonts & Material Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>

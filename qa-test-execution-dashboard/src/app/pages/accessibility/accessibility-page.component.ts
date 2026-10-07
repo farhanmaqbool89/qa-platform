@@ -156,7 +156,7 @@ export class AccessibilityPageComponent implements OnInit, OnDestroy {
   readonly displayedChecklistColumns = ['principle', 'codeAndName', 'status', 'priority'];
 
   readonly quickUrls = [
-    'https://www.expertflow.com/',
+    'https://example.com',
     'https://customer-portal.demo.local',
     'https://google.com'
   ];
@@ -166,7 +166,7 @@ export class AccessibilityPageComponent implements OnInit, OnDestroy {
     private readonly http: HttpClient
   ) {
     this.form = this.formBuilder.group({
-      url: ['https://www.expertflow.com/', [Validators.required, Validators.pattern(/https?:\/\/.+/)]],
+      url: ['', [Validators.required, Validators.pattern(/https?:\/\/.+/)]],
       standard: ['wcag21aa', Validators.required],
       browserMode: ['headless', Validators.required],
       standards: this.formBuilder.group({

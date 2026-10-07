@@ -31,6 +31,22 @@
     @media (max-width: 768px) {
       flex-direction: column;
       align-items: stretch;
+      gap: 1rem;
+      padding: 1rem !important;
+
+      .segmented-mode-tabs {
+        margin: 0.25rem 0 0 0;
+        width: 100%;
+        display: flex;
+
+        .mat-button-toggle {
+          flex: 1;
+          .tab-pill {
+            justify-content: center;
+            padding: 0.45rem 0.5rem;
+          }
+        }
+      }
     }
 
     .mat-mdc-card-header-text {

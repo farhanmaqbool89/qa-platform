@@ -1,1 +1,17 @@
 <router-outlet></router-outlet>
+
+<!-- Sticky Bottom Development Preview Notice -->
+<div class="dev-sticky-banner" *ngIf="!isDismissed" role="status" aria-live="polite">
+  <div class="banner-inner">
+    <span class="badge-pill">
+      <span class="status-dot"></span>
+      DEVELOPMENT PREVIEW
+    </span>
+    <span class="banner-text">
+      Platform services are currently under active development. Full execution capabilities will be available soon.
+    </span>
+    <button type="button" class="dismiss-btn" (click)="dismiss()" aria-label="Dismiss banner" title="Dismiss">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
