@@ -38,6 +38,8 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER:-qadev}:${POSTGRES_PASSWORD:-SuperSecurePass2026!}@postgres:5432/${POSTGRES_DB:-qaplatform}
       REDIS_URL: redis://redis:6379
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       JWT_SECRET: ${JWT_SECRET:-super-secret-qa-platform-jwt-token-key-2026!}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-super-secret-qa-platform-refresh-token-key-2026!}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
