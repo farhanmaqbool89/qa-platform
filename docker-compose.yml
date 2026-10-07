@@ -1,16 +1,16 @@
-﻿services:
+services:
   postgres:
     image: postgres:16-alpine
     container_name: krodux-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: 
-      POSTGRES_PASSWORD: 
-      POSTGRES_DB: 
+      POSTGRES_USER: ${POSTGRES_USER:-qadev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SuperSecurePass2026!}
+      POSTGRES_DB: ${POSTGRES_DB:-qaplatform}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U  -d "]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-qadev} -d ${POSTGRES_DB:-qaplatform}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,11 +36,11 @@
     environment:
       PORT: 3000
       NODE_ENV: production
-      DATABASE_URL: postgresql://:@postgres:5432/
+      DATABASE_URL: postgresql://${POSTGRES_USER:-qadev}:${POSTGRES_PASSWORD:-SuperSecurePass2026!}@postgres:5432/${POSTGRES_DB:-qaplatform}
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: 
-      JWT_REFRESH_SECRET: 
-      CORS_ORIGIN: https://krodux.com
+      JWT_SECRET: ${JWT_SECRET:-super-secret-qa-platform-jwt-token-key-2026!}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-super-secret-qa-platform-refresh-token-key-2026!}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     volumes:
       - backend_artifacts:/app/artifacts
       - backend_data:/app/data
@@ -50,15 +50,7 @@
       redis:
         condition: service_healthy
     ports:
-      - "127.0.0.1:3000:3000"
-
-  tunnel:
-    image: cloudflare/cloudflared:latest
-    container_name: krodux-tunnel
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token 
-    depends_on:
-      - backend
+      - "0.0.0.0:3000:3000"
 
 volumes:
   postgres_data:
