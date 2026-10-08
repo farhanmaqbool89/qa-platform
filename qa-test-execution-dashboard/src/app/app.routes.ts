@@ -44,6 +44,17 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'contact',
+    title: 'Contact Us & Engineering Support | KRODUX',
+    loadComponent: () =>
+      import('./pages/contact/contact-page.component').then((m) => m.ContactPageComponent)
+  },
+  {
+    path: 'contact-us',
+    redirectTo: 'contact',
+    pathMatch: 'full'
+  },
+  {
     path: '',
     loadComponent: () =>
       import('./layout/shell-layout.component').then((m) => m.ShellLayoutComponent),

@@ -1,0 +1,243 @@
+<div class="contact-page-wrapper">
+
+  <!-- TOP HEADER / NAVIGATION -->
+  <header class="contact-header">
+    <div class="header-container">
+      <a class="brand" routerLink="/">
+        <div class="brand-icon-box">
+          <img src="krodux-icon.svg" alt="KRODUX Logo" class="brand-logo-img">
+        </div>
+        <span class="brand-name">KRODUX</span>
+      </a>
+
+      <nav class="nav-links">
+        <a routerLink="/">Home</a>
+        <a routerLink="/accessibility-test">WCAG Demo</a>
+        <a routerLink="/contact" class="active-link">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <a routerLink="/login" class="login-btn">Login</a>
+        <a routerLink="/accessibility-test" class="try-btn">Try WCAG Demo →</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="contact-hero">
+    <div class="hero-container">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>GET IN TOUCH WITH US</span>
+      </div>
+      <h1 class="hero-title">
+        Let’s Connect &amp; Elevate Your<br>
+        <span class="gradient-text">Quality Engineering Lifecycle</span>
+      </h1>
+      <p class="hero-subtitle">
+        Have questions about KRODUX, enterprise deployments, custom test integrations, or security audits? Our team is here to assist.
+      </p>
+    </div>
+  </section>
+
+  <!-- MAIN CONTACT SECTION (CARDS + EMAIL COMPOSER) -->
+  <section class="contact-main">
+    <div class="main-container">
+
+      <!-- LEFT COLUMN: CONTACT INFO & CHANNELS -->
+      <div class="info-column">
+        <div class="info-card primary-email-card">
+          <div class="card-icon-wrapper email-icon">
+            <mat-icon>mail</mat-icon>
+          </div>
+          <div class="card-text">
+            <span class="card-label">Official Team Email</span>
+            <a href="mailto:kroduxteam@gmail.com" class="email-address">{{ teamEmail }}</a>
+            <p class="card-desc">
+              Direct inbox for technical inquiries, sales demos, bug reports, and partnership opportunities.
+            </p>
+          </div>
+          <div class="card-actions">
+            <a [href]="'mailto:' + teamEmail" class="action-btn email-now-btn">
+              <mat-icon>send</mat-icon>
+              <span>Compose Email</span>
+            </a>
+            <button class="action-btn copy-btn" (click)="copyEmail()">
+              <mat-icon>{{ copiedEmail ? 'check' : 'content_copy' }}</mat-icon>
+              <span>{{ copiedEmail ? 'Copied to Clipboard!' : 'Copy Email' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="card-icon-wrapper">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="card-text">
+            <span class="card-label">Response Commitment</span>
+            <h3 class="card-title">Within 24 Hours</h3>
+            <p class="card-desc">
+              Our engineering support team is distributed globally and monitors inboxes around the clock.
+            </p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="card-icon-wrapper">
+            <mat-icon>security</mat-icon>
+          </div>
+          <div class="card-text">
+            <span class="card-label">Security &amp; Compliance</span>
+            <h3 class="card-title">Enterprise Security First</h3>
+            <p class="card-desc">
+              For security disclosures or SOC2/WCAG compliance verification, reach us directly via email.
+            </p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="card-icon-wrapper">
+            <mat-icon>hub</mat-icon>
+          </div>
+          <div class="card-text">
+            <span class="card-label">Custom Integrations</span>
+            <h3 class="card-title">CI/CD &amp; Playwright / Cucumber</h3>
+            <p class="card-desc">
+              Inquire about tailored webhook connectors, AI self-healing locator engines, or dedicated private cloud setups.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: INTERACTIVE EMAIL LAUNCH FORM -->
+      <div class="form-column">
+        <div class="form-card">
+          <div class="form-header">
+            <div class="form-badge">
+              <mat-icon>edit_note</mat-icon>
+              <span>Quick Email Launcher</span>
+            </div>
+            <h2>Send Us an Email</h2>
+            <p>Fill in your details below and click <strong>Launch Email Client</strong> to immediately generate and open a pre-formatted message in your email client addressed to <code>{{ teamEmail }}</code>.</p>
+          </div>
+
+          <form [formGroup]="contactForm" (ngSubmit)="sendEmail()" class="styled-form">
+            <div class="form-row two-cols">
+              <div class="form-field-group">
+                <label for="fullName">Your Full Name <span class="required">*</span></label>
+                <div class="input-container" [class.has-error]="contactForm.get('fullName')?.invalid && contactForm.get('fullName')?.touched">
+                  <mat-icon class="input-icon">person</mat-icon>
+                  <input type="text" id="fullName" formControlName="fullName" placeholder="e.g. Alex Morgan" autocomplete="name">
+                </div>
+                <span class="error-text" *ngIf="contactForm.get('fullName')?.invalid && contactForm.get('fullName')?.touched">
+                  Please enter your name.
+                </span>
+              </div>
+
+              <div class="form-field-group">
+                <label for="senderEmail">Your Email Address <span class="required">*</span></label>
+                <div class="input-container" [class.has-error]="contactForm.get('senderEmail')?.invalid && contactForm.get('senderEmail')?.touched">
+                  <mat-icon class="input-icon">alternate_email</mat-icon>
+                  <input type="email" id="senderEmail" formControlName="senderEmail" placeholder="alex@company.com" autocomplete="email">
+                </div>
+                <span class="error-text" *ngIf="contactForm.get('senderEmail')?.invalid && contactForm.get('senderEmail')?.touched">
+                  Please enter a valid email address.
+                </span>
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-field-group">
+                <label for="category">Inquiry Category <span class="required">*</span></label>
+                <div class="input-container select-container">
+                  <mat-icon class="input-icon">category</mat-icon>
+                  <select id="category" formControlName="category">
+                    <option *ngFor="let cat of inquiryCategories" [value]="cat.value">{{ cat.label }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-field-group">
+                <label for="subject">Email Subject <span class="required">*</span></label>
+                <div class="input-container" [class.has-error]="contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched">
+                  <mat-icon class="input-icon">title</mat-icon>
+                  <input type="text" id="subject" formControlName="subject" placeholder="e.g. Demo request for 50+ engineers">
+                </div>
+                <span class="error-text" *ngIf="contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched">
+                  Please enter a subject (min 4 characters).
+                </span>
+              </div>
+            </div>
+
+            <div class="form-field-group full-width">
+              <label for="message">Your Message / Requirements <span class="required">*</span></label>
+              <div class="input-container textarea-container" [class.has-error]="contactForm.get('message')?.invalid && contactForm.get('message')?.touched">
+                <textarea id="message" formControlName="message" rows="5" placeholder="Describe your inquiry, project scope, questions, or test automation goals..."></textarea>
+              </div>
+              <span class="error-text" *ngIf="contactForm.get('message')?.invalid && contactForm.get('message')?.touched">
+                Please enter a detailed message (min 10 characters).
+              </span>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="submit-btn" [disabled]="contactForm.invalid">
+                <mat-icon>send</mat-icon>
+                <span>Launch Email Client</span>
+              </button>
+            </div>
+
+            <!-- Success notification toast -->
+            <div class="success-banner" *ngIf="emailSentNotification">
+              <mat-icon>mark_email_read</mat-icon>
+              <div>
+                <strong>Email client launched!</strong>
+                <span>Your default email application has been opened with your prefilled message to <code>{{ teamEmail }}</code>.</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQS SECTION -->
+  <section class="faqs-section">
+    <div class="faqs-container">
+      <div class="section-badge">FAQ</div>
+      <h2>Frequently Asked Questions</h2>
+      <div class="faqs-grid">
+        <div class="faq-item" *ngFor="let f of faqs">
+          <h3><mat-icon>help_outline</mat-icon> {{ f.question }}</h3>
+          <p>{{ f.answer }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="contact-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="brand">
+          <div class="brand-icon-box">
+            <img src="krodux-icon.svg" alt="KRODUX Logo" class="brand-logo-img">
+          </div>
+          <span class="brand-name">KRODUX</span>
+        </div>
+        <p>AI-Powered Quality Engineering &amp; Test Automation Platform.</p>
+      </div>
+
+      <div class="footer-links">
+        <a routerLink="/">Home</a>
+        <a routerLink="/accessibility-test">WCAG Testing</a>
+        <a routerLink="/login">Login</a>
+        <a [href]="'mailto:' + teamEmail">{{ teamEmail }}</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Krodux Inc. All rights reserved. Enterprise Quality Engineering Platform.</p>
+    </div>
+  </footer>
+
+</div>
