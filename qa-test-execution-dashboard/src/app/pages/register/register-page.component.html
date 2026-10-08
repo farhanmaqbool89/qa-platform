@@ -38,9 +38,9 @@
         <mat-icon matSuffix>lock</mat-icon>
       </mat-form-field>
 
-      <button mat-raised-button color="primary" type="submit" [disabled]="loading" class="auth-btn" style="margin-top: 1rem;">
+      <button mat-raised-button color="primary" type="submit" [disabled]="true" class="auth-btn" style="margin-top: 1rem;">
         <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
-        <span *ngIf="!loading">Create Account</span>
+        <span>Registration Disabled (Invite Only)</span>
       </button>
     </form>
 
@@ -50,3 +50,4 @@
     </div>
   </div>
 </div>
+
