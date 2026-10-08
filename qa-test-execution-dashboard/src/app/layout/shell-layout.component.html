@@ -105,7 +105,7 @@
 
     <!-- Sidebar Footer: Engine Status & Bottom Expand/Collapse Button -->
     <div class="sidebar-footer">
-      <div class="engine-status-pill" [class.offline]="!isEngineOnline" [title]="isEngineOnline ? 'Connected to WebSocket ws://localhost:3000' : 'Backend Engine Disconnected (http://localhost:3000)'">
+      <div class="engine-status-pill" [class.offline]="!isEngineOnline" [title]="isEngineOnline ? 'Connected to KRODUX Backend API' : 'Backend Engine Offline'">
         <span class="status-indicator" [class.online]="isEngineOnline" [class.offline]="!isEngineOnline"></span>
         <div class="engine-info" *ngIf="!isCollapsed">
           <span class="engine-title">{{ isEngineOnline ? 'Engine Active' : 'Engine Offline' }}</span>

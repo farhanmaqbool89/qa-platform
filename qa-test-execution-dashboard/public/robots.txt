@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /launch
+Disallow: /execution
+Disallow: /projects
+Disallow: /features
+Disallow: /reports
+Disallow: /cicd
+
+Sitemap: https://krodux.com/sitemap.xml

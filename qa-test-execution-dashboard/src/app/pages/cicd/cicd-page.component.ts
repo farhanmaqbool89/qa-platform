@@ -166,8 +166,9 @@ export class CicdPageComponent implements OnInit {
 
   get generatedCurlCommand(): string {
     const val = this.webhookForm.value;
+    const baseApi = environment.apiUrl || 'https://api.krodux.com';
     if (val.triggerType === 'TEST_EXECUTION') {
-      return `curl -X POST http://localhost:3000/api/webhooks/trigger-test \\
+      return `curl -X POST ${baseApi}/api/webhooks/trigger-test \\
   -H "Content-Type: application/json" \\
   -H "X-API-Key: qa_sec_default_token" \\
   -d '{
@@ -178,7 +179,7 @@ export class CicdPageComponent implements OnInit {
     "commitSha": "${val.commitSha}"
   }'`;
     } else {
-      return `curl -X POST http://localhost:3000/api/webhooks/trigger-scan \\
+      return `curl -X POST ${baseApi}/api/webhooks/trigger-scan \\
   -H "Content-Type: application/json" \\
   -H "X-API-Key: qa_sec_default_token" \\
   -d '{
