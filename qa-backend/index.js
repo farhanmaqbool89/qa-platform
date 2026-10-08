@@ -19,7 +19,135 @@ const { formatCucumberTags } = require('./services/tag-formatter.service');
 
 const app = express();
 
-app.use(cors());
+// Security Hardening: Disable Express fingerprint header & inject strict response headers
+app.disable('x-powered-by');
+
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
+// Configure CORS for allowed domains (Production krodux.com / Local Dev)
+const defaultAllowedOrigins = [
+  'https://krodux.com',
+  'https://www.krodux.com',
+  'http://localhost:4200',
+  'http://localhost:3000'
+];
+
+const envAllowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
+  : defaultAllowedOrigins;
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (
+      envAllowedOrigins.includes(origin) ||
+      envAllowedOrigins.includes('*') ||
+      process.env.NODE_ENV !== 'production'
+    ) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS origin '${origin}' unauthorized by security policy.`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-Tenant-ID', 'stripe-signature']
+};
+
+app.use(cors(corsOptions));
+
+/**
+ * Strict SSRF Protection for Web Crawlers and Automated Auditing Endpoints
+ * Prevents targeting internal cloud metadata (169.254.169.254), loopback (127.0.0.0/8),
+ * private subnets (RFC 1918), CGNAT, and internal domain names.
+ */
+function isPublicSafeUrl(urlStr) {
+  if (!urlStr || typeof urlStr !== 'string') return false;
+  try {
+    const parsed = new URL(urlStr.trim());
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return false;
+    }
+
+    const rawHostname = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, '');
+    if (!rawHostname) return false;
+
+    // Disallow loopback & private naming schemes
+    if (
+      rawHostname === 'localhost' ||
+      rawHostname === '0.0.0.0' ||
+      rawHostname === '::1' ||
+      rawHostname === '0:0:0:0:0:0:0:1' ||
+      rawHostname.endsWith('.localhost') ||
+      rawHostname.endsWith('.local') ||
+      rawHostname.endsWith('.internal') ||
+      rawHostname.endsWith('.lan') ||
+      rawHostname.endsWith('.corp') ||
+      rawHostname.endsWith('.home') ||
+      rawHostname.endsWith('.intranet') ||
+      rawHostname.endsWith('.test') ||
+      rawHostname.endsWith('.example') ||
+      rawHostname.endsWith('.invalid')
+    ) {
+      return false;
+    }
+
+    // IPv4 representation validation
+    const ipv4Regex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+    const match = rawHostname.match(ipv4Regex);
+    if (match) {
+      const [ , a, b, c, d ] = match.map(Number);
+      if (a > 255 || b > 255 || c > 255 || d > 255) return false;
+
+      // 0.0.0.0/8
+      if (a === 0) return false;
+      // 127.0.0.0/8 (Loopback)
+      if (a === 127) return false;
+      // 10.0.0.0/8 (Private RFC 1918)
+      if (a === 10) return false;
+      // 172.16.0.0/12 (Private RFC 1918 172.16 - 172.31)
+      if (a === 172 && b >= 16 && b <= 31) return false;
+      // 192.168.0.0/16 (Private RFC 1918)
+      if (a === 192 && b === 168) return false;
+      // 169.254.0.0/16 (Link-Local & Cloud Metadata e.g. AWS/GCP/Azure 169.254.169.254)
+      if (a === 169 && b === 254) return false;
+      // 100.64.0.0/10 (Carrier-grade NAT)
+      if (a === 100 && b >= 64 && b <= 127) return false;
+      // 224.0.0.0/4 (Multicast / Reserved)
+      if (a >= 224) return false;
+    }
+
+    // Disallow hex, octal, or single integer encoded IP evasion strings (e.g. 2130706433, 0x7f000001)
+    if (/^(0x[0-9a-f]+|\d+)$/i.test(rawHostname)) {
+      return false;
+    }
+
+    // Disallow IPv6 Link Local and Unique Local ranges
+    if (rawHostname.includes(':')) {
+      if (
+        rawHostname.startsWith('fe8') ||
+        rawHostname.startsWith('fe9') ||
+        rawHostname.startsWith('fea') ||
+        rawHostname.startsWith('feb') ||
+        rawHostname.startsWith('fc') ||
+        rawHostname.startsWith('fd') ||
+        rawHostname.includes('::ffff:')
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 // Stripe Webhook Endpoint (Requires raw unparsed Buffer for signature verification)
 app.post('/api/billing/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
@@ -51,8 +179,19 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (
+        envAllowedOrigins.includes(origin) ||
+        envAllowedOrigins.includes('*') ||
+        process.env.NODE_ENV !== 'production'
+      ) {
+        return callback(null, true);
+      }
+      return callback(new Error('CORS origin unauthorized for WebSocket'));
+    },
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
@@ -74,6 +213,15 @@ const billingService = require('./services/billing.service');
 const enterpriseSecurityService = require('./services/enterprise-security.service');
 
 // Health & Production Infrastructure Probes (Unauthenticated Public Probes)
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    uptime: Math.round(process.uptime()),
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 app.get('/api/health', (req, res) => {
   const dbStatus = dbService.isDbConnected ? 'connected' : 'disconnected';
   const redisStatus = redisService.isConnected ? 'connected' : 'disconnected';
@@ -854,6 +1002,13 @@ app.get('/api/audit-logs', requireAuth, async (req, res) => {
 app.post('/api/accessibility/live-scan', async (req, res) => {
   const { url = 'https://example.com', standard = 'wcag21aa', standards, projectId = 'customerportal', environment = 'QA' } = req.body || {};
 
+  if (!isPublicSafeUrl(url)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid or restricted target URL. Target must be a valid public HTTP/HTTPS website (internal IP ranges, loopback, and cloud metadata endpoints are blocked for security).'
+    });
+  }
+
   console.log('========================================');
   console.log('[LIVE-SCAN] Dispatching interactive browser scan via BrowserPoolManager');
   console.log('[LIVE-SCAN] Target URL:', url, 'Project:', projectId, 'Env:', environment);
@@ -1342,23 +1497,6 @@ const executionQueue = new ExecutionQueueManager();
  * 🌐 SAFE PUBLIC DEMO ENDPOINTS (LANDING PAGE)
  * ============================================
  */
-
-function isPublicSafeUrl(urlStr) {
-  try {
-    const parsed = new URL(urlStr);
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false;
-    const hostname = parsed.hostname.toLowerCase();
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0' || hostname === '::1' || hostname.endsWith('.local') || hostname.endsWith('.internal')) {
-      return false;
-    }
-    if (/^10\./.test(hostname) || /^192\.168\./.test(hostname) || /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname)) {
-      return false;
-    }
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
 
 const publicScanLimitMap = new Map();
 app.post('/api/public/wcag-scan', async (req, res) => {
@@ -2851,6 +2989,27 @@ function cleanErrorMessage(errorMessage) {
     .replace('Error:', '')
     .trim();
 }
+
+// 404 JSON Fallback Handler (Prevents default Express HTML disclosure)
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Cannot ${req.method} ${req.path}`,
+    error: 'Not Found'
+  });
+});
+
+// Centralized JSON Error Handler
+app.use((err, req, res, next) => {
+  const statusCode = err.status || err.statusCode || 500;
+  const isProd = process.env.NODE_ENV === 'production';
+  console.error(`[ERROR] ${req.method} ${req.path}:`, err.message || err);
+  res.status(statusCode).json({
+    success: false,
+    message: err.message || 'Internal Server Error',
+    ...(isProd ? {} : { stack: err.stack })
+  });
+});
 
 const PORT = 3000;
 if (require.main === module) {
