@@ -23,12 +23,16 @@ function getLaunchOptions(browserMode = BROWSER_MODES.HEADLESS) {
       ? [
           '--start-maximized',
           '--no-sandbox',
-          '--disable-setuid-sandbox'
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu'
         ]
       : [
           '--no-sandbox',
           '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage'
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+          '--no-first-run'
         ]
   };
 
