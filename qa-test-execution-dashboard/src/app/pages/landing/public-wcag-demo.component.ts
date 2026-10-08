@@ -1,9 +1,9 @@
 import { environment } from '../../../environments/environment';
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -14,55 +14,41 @@ export interface ViolationNode {
   failureSummary?: string;
 }
 
-export interface ViolationItem {
+export interface WcagViolationItem {
   id: string;
-  impact: string;
-  description: string;
-  help: string;
+  impact?: string;
+  help?: string;
+  description?: string;
   helpUrl?: string;
-  tags?: string[];
   nodes?: ViolationNode[];
 }
 
-export interface ComplianceChecklistItem {
-  key: string;
-  title: string;
-  subtitle: string;
-  compliant: boolean;
-  violationsCount: number;
-}
-
-export interface PassedAuditItem {
-  id: string;
-  description?: string;
-  help?: string;
-  helpUrl?: string;
-  passedNodesCount?: number;
-}
-
 export interface PublicWcagReport {
-  scanId?: string;
-  url?: string;
+  score: number;
+  url: string;
   targetTitle?: string;
   scanTime?: string;
-  score: number;
   summary?: {
-    score?: number;
-    totalViolationsCount?: number;
-    criticalCount?: number;
-    seriousCount?: number;
-    moderateCount?: number;
-    minorCount?: number;
-    passedAuditsCount?: number;
+    criticalCount: number;
+    seriousCount: number;
+    moderateCount: number;
+    minorCount: number;
+    totalViolations: number;
+    passedAuditsCount: number;
   };
-  complianceChecklist?: ComplianceChecklistItem[];
-  allViolations?: ViolationItem[];
-  violations?: ViolationItem[];
-  criticalIssues?: ViolationItem[];
-  seriousIssues?: ViolationItem[];
-  moderateIssues?: ViolationItem[];
-  minorIssues?: ViolationItem[];
-  passedAudits?: PassedAuditItem[];
+  criticalIssues?: WcagViolationItem[];
+  seriousIssues?: WcagViolationItem[];
+  moderateIssues?: WcagViolationItem[];
+  minorIssues?: WcagViolationItem[];
+  allViolations?: WcagViolationItem[];
+  violations?: WcagViolationItem[];
+  passedAudits?: { id: string; help?: string; passedNodesCount?: number }[];
+  complianceChecklist?: {
+    standard: string;
+    title: string;
+    compliant: boolean;
+    violationsCount: number;
+  }[];
 }
 
 @Component({
@@ -79,6 +65,11 @@ export class PublicWcagDemoComponent {
   errorMessage = '';
 
   constructor(private http: HttpClient) {}
+
+  setSampleUrl(url: string): void {
+    this.targetUrl = url;
+    this.errorMessage = '';
+  }
 
   runPublicScan(): void {
     if (!this.targetUrl) return;

@@ -34,9 +34,17 @@
       </div>
 
       <!-- ERROR ALERT BANNER -->
+            <!-- ERROR ALERT BANNER -->
       <div class="error-banner" *ngIf="errorMessage">
-        <mat-icon>error_outline</mat-icon>
-        <span>{{ errorMessage }}</span>
+        <mat-icon class="err-main-icon">error_outline</mat-icon>
+        <div class="err-text-content">
+          <div class="err-main-msg">{{ errorMessage }}</div>
+          <div class="err-tip">
+            <span>Try scanning a verified public site:</span>
+            <button type="button" class="tip-btn" (click)="setSampleUrl('https://example.com')">https://example.com</button>
+            <button type="button" class="tip-btn" (click)="setSampleUrl('https://github.com')">https://github.com</button>
+          </div>
+        </div>
       </div>
 
       <!-- FULL COMPREHENSIVE SCAN REPORT -->
@@ -139,3 +147,6 @@
   </main>
 
 </div>
+
+
+
