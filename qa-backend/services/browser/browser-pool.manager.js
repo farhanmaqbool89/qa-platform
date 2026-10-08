@@ -1,84 +1,63 @@
 const { chromium } = require('playwright');
 const { getLaunchOptions, BROWSER_MODES } = require('./browser-options');
 
-/**
- * Enterprise Browser Lifecycle States Enum
- */
-const BROWSER_LIFECYCLE_STATES = Object.freeze({
+const BROWSER_LIFECYCLE_STATES = {
   NEW: 'NEW',
-  AUTHENTICATING: 'AUTHENTICATING',
   ACTIVE: 'ACTIVE',
-  EXPIRED: 'EXPIRED',
-  INVALID: 'INVALID',
+  IDLE: 'IDLE',
   CLOSED: 'CLOSED'
-});
+};
 
-/**
- * Enterprise BrowserPoolManager
- * Responsible for maintaining reusable Playwright browser instances, context pools,
- * tracking browser lifecycle states and PID supervision across QA Platform modules.
- */
 class BrowserPoolManager {
   constructor() {
-    // Map of sessionKey -> PoolEntry
-    // PoolEntry = { browser, context, page, pid, state, lastActive, keepAliveTimer, projectId, environment }
     this.pools = new Map();
-    this.BROWSER_LIFECYCLE_STATES = BROWSER_LIFECYCLE_STATES;
   }
 
-  /**
-   * Resolve a session key from parameters
-   */
-  resolveSessionKey(projectId = 'default', environment = 'QA') {
-    const cleanProj = String(projectId || 'default').replace(/[^a-zA-Z0-9_-]/g, '_');
-    const cleanEnv = String(environment || 'QA').replace(/[^a-zA-Z0-9_-]/g, '_');
-    return `${cleanProj}_${cleanEnv}`;
+  resolveSessionKey(projectId = 'customerportal', environment = 'QA') {
+    return `${projectId}_${environment}`;
   }
 
-  /**
-   * Get an existing pool entry if valid & alive, or create a new browser instance
-   */
   async getOrCreateBrowser(sessionKey = 'default_QA', browserMode = BROWSER_MODES.HEADLESS, extraOptions = {}) {
     const isInteractive = String(browserMode).toLowerCase() === BROWSER_MODES.INTERACTIVE;
+    
     let entry = this.pools.get(sessionKey);
-
-    // Check if entry exists and browser process is still alive
-    if (entry && entry.browser) {
-      const isConnected = entry.browser.isConnected && entry.browser.isConnected();
-      if (isConnected && entry.state !== BROWSER_LIFECYCLE_STATES.CLOSED) {
-        console.log(`[BrowserPoolManager] ♻️ Reusing existing active browser instance (PID: ${entry.pid}, State: ${entry.state}) for session: ${sessionKey}`);
+    if (entry && entry.browser && entry.state !== BROWSER_LIFECYCLE_STATES.CLOSED) {
+      if (entry.browser.isConnected()) {
+        entry.state = BROWSER_LIFECYCLE_STATES.ACTIVE;
         entry.lastActive = Date.now();
         return entry.browser;
       } else {
-        console.warn(`[BrowserPoolManager] ⚠️ Browser process for session "${sessionKey}" (PID: ${entry.pid}) was disconnected/closed. Recreating...`);
         this.cleanupEntry(sessionKey);
       }
     }
 
-    // Launch a new browser process
     const launchOptions = {
       ...getLaunchOptions(browserMode),
       ...extraOptions
     };
 
-    console.log(`[BrowserPoolManager] 🚀 Launching new Playwright Chromium instance for session "${sessionKey}" (Mode: ${browserMode}, Headless: ${launchOptions.headless})...`);
+    console.log(`[BrowserPoolManager] ?? Launching Playwright Chromium for session "${sessionKey}" (Mode: ${browserMode}, Headless: ${launchOptions.headless})...`);
     
     let browser;
     try {
       browser = await chromium.launch(launchOptions);
     } catch (err) {
-      console.warn(`[BrowserPoolManager] Preferred launch failed (${err.message}). Trying fallback launch without channel...`);
-      const fallbackOptions = { ...launchOptions };
-      delete fallbackOptions.channel;
+      console.warn(`[BrowserPoolManager] Preferred launch failed (${err.message}). Trying fallback with container flags...`);
+      const fallbackOptions = {
+        headless: !isInteractive,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+          '--no-first-run'
+        ]
+      };
       try {
         browser = await chromium.launch(fallbackOptions);
       } catch (err2) {
-        console.warn(`[BrowserPoolManager] Default launch failed (${err2.message}). Trying system browser fallback (msedge / chrome)...`);
-        try {
-          browser = await chromium.launch({ ...fallbackOptions, channel: 'msedge' });
-        } catch (err3) {
-          browser = await chromium.launch({ ...fallbackOptions, channel: 'chrome' });
-        }
+        console.error(`[BrowserPoolManager] Chromium launch failed: ${err2.message}`);
+        throw new Error(`Failed to launch browser: ${err2.message}. Ensure Playwright Chromium is installed.`);
       }
     }
 
@@ -90,7 +69,7 @@ class BrowserPoolManager {
       }
     } catch (e) {}
 
-    console.log(`[BrowserPoolManager] ✅ Browser launched successfully (PID: ${pid || 'N/A'}, SessionKey: ${sessionKey}).`);
+    console.log(`[BrowserPoolManager] ? Browser launched successfully (PID: ${pid || 'N/A'}, SessionKey: ${sessionKey}).`);
 
     entry = {
       browser,
@@ -106,9 +85,8 @@ class BrowserPoolManager {
 
     this.pools.set(sessionKey, entry);
 
-    // Track unexpected browser exit
     browser.on('disconnected', () => {
-      console.log(`[BrowserPoolManager] 🔌 Browser process (PID: ${pid}, Session: ${sessionKey}) disconnected.`);
+      console.log(`[BrowserPoolManager] ?? Browser process (PID: ${pid}, Session: ${sessionKey}) disconnected.`);
       const current = this.pools.get(sessionKey);
       if (current && current.browser === browser) {
         current.state = BROWSER_LIFECYCLE_STATES.CLOSED;
@@ -118,27 +96,21 @@ class BrowserPoolManager {
     return browser;
   }
 
-  /**
-   * Get or create a reusable browser context for a sessionKey
-   */
   async getOrCreateContext(sessionKey = 'default_QA', browserMode = BROWSER_MODES.HEADLESS, contextOptions = {}) {
     const browser = await this.getOrCreateBrowser(sessionKey, browserMode);
     const entry = this.pools.get(sessionKey);
 
-    // Reuse context if context exists and is alive
     if (entry.context) {
       try {
         const pages = entry.context.pages();
         if (pages && pages.length >= 0 && entry.state !== BROWSER_LIFECYCLE_STATES.CLOSED) {
-          console.log(`[BrowserPoolManager] ♻️ Reusing existing BrowserContext for session: ${sessionKey}`);
           return entry.context;
         }
       } catch (e) {
-        console.warn(`[BrowserPoolManager] Existing context invalid for session "${sessionKey}". Recreating context...`);
+        console.warn(`[BrowserPoolManager] Context invalid for "${sessionKey}", recreating...`);
       }
     }
 
-    console.log(`[BrowserPoolManager] ➕ Creating new BrowserContext for session: ${sessionKey}`);
     const defaultOptions = {
       viewport: entry.isInteractive ? null : { width: 1280, height: 800 },
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -153,15 +125,11 @@ class BrowserPoolManager {
     return context;
   }
 
-  /**
-   * Get or create a reusable active Page for a sessionKey
-   */
   async getOrCreatePage(sessionKey = 'default_QA', browserMode = BROWSER_MODES.HEADLESS, contextOptions = {}) {
     const context = await this.getOrCreateContext(sessionKey, browserMode, contextOptions);
     const entry = this.pools.get(sessionKey);
 
     if (entry.page && !entry.page.isClosed()) {
-      console.log(`[BrowserPoolManager] ♻️ Reusing active Page for session: ${sessionKey}`);
       try {
         await entry.page.bringToFront();
       } catch (e) {}
@@ -177,7 +145,6 @@ class BrowserPoolManager {
       return entry.page;
     }
 
-    console.log(`[BrowserPoolManager] 📄 Opening new Page in context for session: ${sessionKey}`);
     const page = await context.newPage();
     entry.page = page;
     try {
@@ -186,20 +153,13 @@ class BrowserPoolManager {
     return page;
   }
 
-  /**
-   * Set lifecycle state for a session
-   */
   setSessionState(sessionKey, state) {
     const entry = this.pools.get(sessionKey);
     if (entry) {
-      console.log(`[BrowserPoolManager] 🔄 Session "${sessionKey}" state transition: ${entry.state} ➔ ${state}`);
       entry.state = state;
     }
   }
 
-  /**
-   * Get metadata for a session
-   */
   getSessionInfo(sessionKey) {
     const entry = this.pools.get(sessionKey);
     if (!entry) return null;
@@ -215,24 +175,13 @@ class BrowserPoolManager {
     };
   }
 
-  /**
-   * Keep browser window alive for interactive inspection
-   */
   keepAlive(sessionKey, durationMs = 25000) {
     const entry = this.pools.get(sessionKey);
     if (!entry) return;
-
-    if (entry.keepAliveTimer) {
-      clearTimeout(entry.keepAliveTimer);
-    }
-
-    console.log(`[BrowserPoolManager] ⏳ Session "${sessionKey}" keep-alive extend: ${durationMs}ms`);
+    if (entry.keepAliveTimer) clearTimeout(entry.keepAliveTimer);
     entry.lastActive = Date.now();
   }
 
-  /**
-   * Clean up pool entry object
-   */
   cleanupEntry(sessionKey) {
     const entry = this.pools.get(sessionKey);
     if (entry) {
@@ -242,16 +191,11 @@ class BrowserPoolManager {
     }
   }
 
-  /**
-   * Gracefully close browser for a specific sessionKey
-   */
   async close(sessionKey) {
     const entry = this.pools.get(sessionKey);
     if (entry) {
-      console.log(`[BrowserPoolManager] 🛑 Closing browser session: ${sessionKey} (PID: ${entry.pid})`);
       if (entry.keepAliveTimer) clearTimeout(entry.keepAliveTimer);
       entry.state = BROWSER_LIFECYCLE_STATES.CLOSED;
-
       try {
         if (entry.page && !entry.page.isClosed()) await entry.page.close().catch(() => {});
         if (entry.context) await entry.context.close().catch(() => {});
@@ -264,17 +208,12 @@ class BrowserPoolManager {
     }
   }
 
-  /**
-   * Close all active browser instances in pool
-   */
   async closeAll() {
-    console.log(`[BrowserPoolManager] 🛑 Closing all active browser instances (${this.pools.size} active sessions)...`);
     const keys = Array.from(this.pools.keys());
     for (const key of keys) {
       await this.close(key);
     }
     this.pools.clear();
-    console.log(`[BrowserPoolManager] ✅ All browser sessions closed.`);
   }
 }
 
